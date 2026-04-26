@@ -8,7 +8,7 @@ import {
 } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 
 import { AuthService } from './shared/auth.service';
 import { environment } from '../environments/environment';
@@ -38,15 +38,12 @@ export class AppInterceptor implements HttpInterceptor {
         if (err.status === 401) {
           this.authService.clearUserSession();
           this.router.navigate(['/auth/login']);
-        } else {
-          console.error(err);
-          if(req.url.match(/.*\/products\/.+/g)){
-            throw [err];
-          }
-          this.errorService.setError(err.error.message);
-          throw [err];
+          return throwError(() => err);
         }
-        return [err];
+        if (!req.url.match(/\/products\/.+/)) {
+          this.errorService.setError(err.error?.message ?? 'Unknown error');
+        }
+        return throwError(() => err);
       })
     );
   }
