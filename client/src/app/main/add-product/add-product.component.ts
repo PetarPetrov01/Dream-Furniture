@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
@@ -23,14 +23,13 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 @Component({
     selector: 'app-add-product',
     imports: [
-        MatSelectModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        NgIf,
-        LazyLoadImageModule,
-        LoaderComponent
-    ],
+    MatSelectModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    LazyLoadImageModule,
+    LoaderComponent
+],
     templateUrl: './add-product.component.html',
     styleUrl: './add-product.component.css'
 })

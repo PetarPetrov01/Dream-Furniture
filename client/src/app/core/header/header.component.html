@@ -9,51 +9,53 @@
       <li>
         <a routerLink="/home" routerLinkActive="active"
           >Home</a
-        >
-      </li>
-      <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
-      <ng-container *ngIf="!isLogged">
-        <li><a routerLink="/auth/login" routerLinkActive="active">Login</a></li>
-        <li>
-          <a routerLink="/auth/register" routerLinkActive="active">Register</a>
+          >
         </li>
-      </ng-container>
-      <ng-container *ngIf="isLogged">
-        <li>
-          <a routerLink="add-product" routerLinkActive="active">Create</a>
-        </li>
-        <li>
-          <a [matMenuTriggerFor]="menu" [class.active]="isProfileActive()"
-            ><i class="fa-solid fa-user"></i
-          ></a>
-          <mat-menu #menu="matMenu" xPosition="before" class="custom-class">
-            <a mat-menu-item routerLink="/profile">Profile page</a>
-            <a mat-menu-item routerLink="/profile/wishlist">Wishlist</a>
-            <a mat-menu-item routerLink="/profile/orders">Orders</a>
-            <a mat-menu-item (click)="handleLogout()">Logout</a>
-          </mat-menu>
-        </li>
-        <li>
-          <a routerLinkActive="active" routerLink="/cart"
-            ><i
+        <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
+        @if (!isLogged) {
+          <li><a routerLink="/auth/login" routerLinkActive="active">Login</a></li>
+          <li>
+            <a routerLink="/auth/register" routerLinkActive="active">Register</a>
+          </li>
+        }
+        @if (isLogged) {
+          <li>
+            <a routerLink="add-product" routerLinkActive="active">Create</a>
+          </li>
+          <li>
+            <a [matMenuTriggerFor]="menu" [class.active]="isProfileActive()"
+              ><i class="fa-solid fa-user"></i
+            ></a>
+            <mat-menu #menu="matMenu" xPosition="before" class="custom-class">
+              <a mat-menu-item routerLink="/profile">Profile page</a>
+              <a mat-menu-item routerLink="/profile/wishlist">Wishlist</a>
+              <a mat-menu-item routerLink="/profile/orders">Orders</a>
+              <a mat-menu-item (click)="handleLogout()">Logout</a>
+            </mat-menu>
+          </li>
+          <li>
+            <a routerLinkActive="active" routerLink="/cart"
+              ><i
               class="fa-solid fa-cart-shopping"
               [matBadge]="cartQuantity > 9 ? '9+' : cartQuantity"
               [matBadgeHidden]="cartQuantity == 0"
               matBadgeColor="warn"
               matBadgeSize="small"
-            ></i
-          ></a>
-        </li>
-      </ng-container>
-    </ul>
-  </nav>
-  <div class="container" *ngIf="isHomeActive">
-    <div class="banner-content">
-      <h2>
-        <p>Elevate your</p>
-        <p>Home</p>
-        <p>With us</p>
-      </h2>
-    </div>
-  </div>
-</header>
+              ></i
+            ></a>
+          </li>
+        }
+      </ul>
+    </nav>
+    @if (isHomeActive) {
+      <div class="container">
+        <div class="banner-content">
+          <h2>
+            <p>Elevate your</p>
+            <p>Home</p>
+            <p>With us</p>
+          </h2>
+        </div>
+      </div>
+    }
+  </header>

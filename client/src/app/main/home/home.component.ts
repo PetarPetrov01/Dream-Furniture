@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import {  Subscription } from 'rxjs';
 import { APIProduct } from '../../types/Product';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { LoaderCardComponent } from '../../shared/loader-card/loader-card.component';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
@@ -10,7 +10,7 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
+    imports: [RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })

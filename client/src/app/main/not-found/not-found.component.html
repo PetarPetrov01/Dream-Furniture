@@ -5,14 +5,18 @@
         <h1>404!</h1>
       </header>
 
-      <div class="wrapper missing-page" *ngIf="!productId">
-        <h2>Page not found</h2>
-      </div>
-      <div class="wrapper missing-product" *ngIf="productId">
-        <p>
-          A product with id <span>{{ productId }}</span> does not exist!
-        </p>
-      </div>
+      @if (!productId) {
+        <div class="wrapper missing-page">
+          <h2>Page not found</h2>
+        </div>
+      }
+      @if (productId) {
+        <div class="wrapper missing-product">
+          <p>
+            A product with id <span>{{ productId }}</span> does not exist!
+          </p>
+        </div>
+      }
       <a id="home-btn" mat-raised-button routerLink="/">Go home</a>
     </main>
   </div>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgIf, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { Store } from '@ngrx/store';
@@ -13,7 +13,7 @@ import { CartState } from '../../types/State';
 
 @Component({
     selector: 'app-header',
-    imports: [RouterLink, RouterLinkActive, NgIf, MatMenuModule, MatBadgeModule],
+    imports: [RouterLink, RouterLinkActive, MatMenuModule, MatBadgeModule],
     templateUrl: './header.component.html',
     styleUrl: './header.component.css'
 })

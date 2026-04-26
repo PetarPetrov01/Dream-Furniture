@@ -11,75 +11,81 @@
             placeholder="Type your email"
             formControlName="email"
             appEmailValidate
-          />
-          <div class="errors">
-            <ng-container *ngIf="loginForm.get('email')?.touched">
-              <p
-                class="error"
-                *ngIf="loginForm.get('email')?.errors?.['required']"
-              >
-                Email is required!
-              </p>
-              <p
-                class="error"
-                *ngIf="loginForm.get('email')?.errors?.['email']"
-              >
-                Invalid email!
-              </p>
-            </ng-container>
+            />
+            <div class="errors">
+              @if (loginForm.get('email')?.touched) {
+                @if (loginForm.get('email')?.errors?.['required']) {
+                  <p
+                    class="error"
+                    >
+                    Email is required!
+                  </p>
+                }
+                @if (loginForm.get('email')?.errors?.['email']) {
+                  <p
+                    class="error"
+                    >
+                    Invalid email!
+                  </p>
+                }
+              }
+            </div>
           </div>
-        </div>
 
-        <div class="input-group password">
-          <label for="">Password</label>
-          <input
-            [type]="showPass ? 'text' : 'password'"
-            placeholder="Type your password"
-            formControlName="password"
-          />
-          <div class="show-pass" (click)="toggleShowPass()">
-            <i
-              class="fa-solid"
-              [ngClass]="showPass ? 'fa-eye' : 'fa-eye-slash'"
-            ></i>
-          </div>
-          <div class="errors">
-            <ng-container *ngIf="loginForm.get('password')?.touched">
-              <p
-                class="error"
-                *ngIf="loginForm.get('password')?.errors?.['required']"
-              >
-                Password is required!
-              </p>
-            </ng-container>
-          </div>
-        </div>
+          <div class="input-group password">
+            <label for="">Password</label>
+            <input
+              [type]="showPass ? 'text' : 'password'"
+              placeholder="Type your password"
+              formControlName="password"
+              />
+              <div class="show-pass" (click)="toggleShowPass()">
+                <i
+                  class="fa-solid"
+                  [ngClass]="showPass ? 'fa-eye' : 'fa-eye-slash'"
+                ></i>
+              </div>
+              <div class="errors">
+                @if (loginForm.get('password')?.touched) {
+                  @if (loginForm.get('password')?.errors?.['required']) {
+                    <p
+                      class="error"
+                      >
+                      Password is required!
+                    </p>
+                  }
+                }
+              </div>
+            </div>
 
-        <button
-          class="login-btn"
-          [disabled]="loginForm.invalid"
-          (click)="handleLoginSubmit()"
-        >
-          <p *ngIf="!isLoading">Login</p>
-          <app-loader
-            type="dots"
-            *ngIf="isLoading"
-            diameter="14px"
-            width="7px"
-          />
-        </button>
-      </form>
-      <div class="register-redirect">
-        <p>Or</p>
-        <a routerLink="../register">Register</a>
+            <button
+              class="login-btn"
+              [disabled]="loginForm.invalid"
+              (click)="handleLoginSubmit()"
+              >
+              @if (!isLoading) {
+                <p>Login</p>
+              }
+              @if (isLoading) {
+                <app-loader
+                  type="dots"
+                  diameter="14px"
+                  width="7px"
+                  />
+              }
+            </button>
+          </form>
+          <div class="register-redirect">
+            <p>Or</p>
+            <a routerLink="../register">Register</a>
+          </div>
+        </article>
+        <article class="media">
+          <img
+            src="assets/images/login-side2-small.jpg"
+            lazyLoad="assets/images/login-side2.jpg"
+            alt=""
+            />
+          </article>
+        </section>
       </div>
-    </article>
-    <article class="media">
-      <img
-        src="assets/images/login-side2-small.jpg"
-        lazyLoad="assets/images/login-side2.jpg"
-        alt=""
-      />
-    </article>
-  </section>
-</div>

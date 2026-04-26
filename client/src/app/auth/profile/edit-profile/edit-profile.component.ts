@@ -13,22 +13,21 @@ import {
 import { AuthService } from '../../../shared/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CommonModule } from '@angular/common';
+
 import { EmailValidateDirective } from '../../../shared/validators/email-validator.directive';
 
 @Component({
     selector: 'app-edit-profile',
     imports: [
-        CommonModule,
-        MatDialogContent,
-        MatDialogActions,
-        MatDialogClose,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        FormsModule,
-        MatInputModule,
-        EmailValidateDirective,
-    ],
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    FormsModule,
+    MatInputModule,
+    EmailValidateDirective
+],
     templateUrl: './edit-profile.component.html',
     styleUrl: './edit-profile.component.css'
 })

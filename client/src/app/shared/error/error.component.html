@@ -1,11 +1,13 @@
-<div class="error-container" *ngIf="error">
+@if (error) {
+  <div class="error-container">
     <div class="error">
-        <div class="icon">
-            <i class="fa-solid fa-xmark"></i>
-        </div>
-        <div class="info">
-            <h4>ERROR</h4>
-            <p>{{error}}</p>
-        </div>
+      <div class="icon">
+        <i class="fa-solid fa-xmark"></i>
+      </div>
+      <div class="info">
+        <h4>ERROR</h4>
+        <p>{{error}}</p>
+      </div>
     </div>
-</div>
+  </div>
+}

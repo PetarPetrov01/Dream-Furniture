@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -14,7 +14,7 @@ import { APIProduct } from '../../types/Product';
 
 @Component({
     selector: 'app-profile',
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })

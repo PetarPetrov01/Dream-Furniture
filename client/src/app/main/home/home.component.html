@@ -15,29 +15,30 @@
           high-quality, customizable furniture accessible to everyone.
         </p>
       </article>
-      <ng-container *ngIf="products.length == 0">
+      @if (products.length == 0) {
         <app-loader-card class="card"/>
         <app-loader-card class="card"/>
         <app-loader-card class="card"/>
-      </ng-container>
-      <ng-container *ngIf="products.length > 0">
-        <article
-          class="card"
-          *ngFor="let product of products"
-          [routerLink]="'/products/' + product._id"
-        >
-          <div class="media">
-            <img [src]="product.image" [alt]="product.name" />
-          </div>
-          <div class="content">
-            <p>{{ product.name }}</p>
-            <h3>
-              ${{ product.price | floorPrice }}
-              <span>{{ product.price | decimalSlice }}</span>
-            </h3>
-          </div>
-        </article>
-      </ng-container>
+      }
+      @if (products.length > 0) {
+        @for (product of products; track product) {
+          <article
+            class="card"
+            [routerLink]="'/products/' + product._id"
+            >
+            <div class="media">
+              <img [src]="product.image" [alt]="product.name" />
+            </div>
+            <div class="content">
+              <p>{{ product.name }}</p>
+              <h3>
+                ${{ product.price | floorPrice }}
+                <span>{{ product.price | decimalSlice }}</span>
+              </h3>
+            </div>
+          </article>
+        }
+      }
     </div>
   </section>
 </div>

@@ -4,27 +4,33 @@
     <mat-form-field>
       <mat-label>Email</mat-label>
       <input matInput placeholder="Email" formControlName="email" appEmailValidate/>
-      <mat-error *ngIf="editForm.get('email')?.hasError('required')"
-              >Email is required</mat-error
+      @if (editForm.get('email')?.hasError('required')) {
+        <mat-error
+          >Email is required</mat-error
+          >
+        }
+        @if (editForm.get('email')?.hasError('email')) {
+          <mat-error
+            >Invalid email</mat-error
             >
-      <mat-error *ngIf="editForm.get('email')?.hasError('email')"
-              >Invalid email</mat-error
-            >
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput placeholder="Username" formControlName="username" />
-      <mat-error *ngIf="editForm.get('username')?.hasError('required')"
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Username</mat-label>
+          <input matInput placeholder="Username" formControlName="username" />
+          @if (editForm.get('username')?.hasError('required')) {
+            <mat-error
               >Username is required</mat-error
-            >
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <div class="controls">
-    <button mat-dialog-close id="cancel-btn">Cancel</button>
-    <button mat-dialog-close id="save-btn" (click)="onConfirm()">Save</button>
-  </div>
-</mat-dialog-actions>
+              >
+            }
+          </mat-form-field>
+        </form>
+      </mat-dialog-content>
+      <mat-dialog-actions>
+        <div class="controls">
+          <button mat-dialog-close id="cancel-btn">Cancel</button>
+          <button mat-dialog-close id="save-btn" (click)="onConfirm()">Save</button>
+        </div>
+      </mat-dialog-actions>
 
 

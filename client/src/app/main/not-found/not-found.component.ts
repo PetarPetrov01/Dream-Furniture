@@ -1,4 +1,4 @@
-import {  NgIf } from '@angular/common';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
@@ -7,7 +7,7 @@ import {MatButtonModule} from '@angular/material/button'
 
 @Component({
     selector: 'app-not-found',
-    imports: [NgIf, MatButtonModule, RouterLink],
+    imports: [MatButtonModule, RouterLink],
     templateUrl: './not-found.component.html',
     styleUrl: './not-found.component.css'
 })

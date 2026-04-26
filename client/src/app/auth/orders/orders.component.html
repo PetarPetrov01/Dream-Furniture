@@ -5,48 +5,56 @@
         <h2>Orders <span>count: {{orders.length}}</span></h2>
       </div>
 
-      <div class="filler" *ngIf="orders.length > 0"></div>
+      @if (orders.length > 0) {
+        <div class="filler"></div>
+      }
 
       <div class="orders-wrapper">
-        <div class="no-products" *ngIf="orders.length < 1">
-          <h2>No orders yet</h2>
-          <p>You don't have any pending orders. Browse our products to order</p>
-          <a routerLink="/products">Products</a>
-        </div>
-
-        <ng-container *ngIf="orders.length > 0">
-          <div class="order-card" *ngFor="let order of orders">
-            <div class="order-heading">
-              <h3><span>№ {{order._id.slice(-8)}}</span> - Processing</h3>
-              <p>{{ order.createdAt | dateFormatter }}</p>
-            </div>
-            <div *ngFor="let product of order.products" class="product-card">
-              <div class="media">
-                <a [routerLink]="'/products/' + product.product._id">
-                  <img [src]="product.product.image" alt="" />
-                </a>
-              </div>
-              <div class="product-info">
-                <div class="main-info">
-                  <h2>{{ product.product.name }}</h2>
-                  <p>{{ product.product.category.join(", ") }}</p>
-                  <p>{{ product.product.material.join(", ") }}</p>
-                </div>
-                <div class="price">
-                  <p>${{ product.product.price }}</p>
-                  <p>x {{ product.count }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="order-controls">
-              <a id="delete-btn" (click)="handleDelete(order._id)">Delete order</a>
-              <h3>
-                Total: ${{ order.totalPrice | floorPrice }}
-                <span>{{ order.totalPrice | decimalSlice }}</span>
-              </h3>
-            </div>
+        @if (orders.length < 1) {
+          <div class="no-products">
+            <h2>No orders yet</h2>
+            <p>You don't have any pending orders. Browse our products to order</p>
+            <a routerLink="/products">Products</a>
           </div>
-        </ng-container>
+        }
+
+        @if (orders.length > 0) {
+          @for (order of orders; track order) {
+            <div class="order-card">
+              <div class="order-heading">
+                <h3><span>№ {{order._id.slice(-8)}}</span> - Processing</h3>
+                <p>{{ order.createdAt | dateFormatter }}</p>
+              </div>
+              @for (product of order.products; track product) {
+                <div class="product-card">
+                  <div class="media">
+                    <a [routerLink]="'/products/' + product.product._id">
+                      <img [src]="product.product.image" alt="" />
+                    </a>
+                  </div>
+                  <div class="product-info">
+                    <div class="main-info">
+                      <h2>{{ product.product.name }}</h2>
+                      <p>{{ product.product.category.join(", ") }}</p>
+                      <p>{{ product.product.material.join(", ") }}</p>
+                    </div>
+                    <div class="price">
+                      <p>${{ product.product.price }}</p>
+                      <p>x {{ product.count }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+              <div class="order-controls">
+                <a id="delete-btn" (click)="handleDelete(order._id)">Delete order</a>
+                <h3>
+                  Total: ${{ order.totalPrice | floorPrice }}
+                  <span>{{ order.totalPrice | decimalSlice }}</span>
+                </h3>
+              </div>
+            </div>
+          }
+        }
       </div>
     </div>
   </div>

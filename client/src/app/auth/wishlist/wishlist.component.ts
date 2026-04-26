@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -18,7 +18,7 @@ import * as CartActions from '../cart/cart.actions';
 
 @Component({
     selector: 'app-wishlist',
-    imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
+    imports: [RouterLink, FloorPricePipe, DecimalSlicePipe],
     templateUrl: './wishlist.component.html',
     styleUrl: './wishlist.component.css'
 })
