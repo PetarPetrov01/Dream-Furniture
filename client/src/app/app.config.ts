@@ -1,10 +1,8 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import {
-  HttpClientModule,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { appInterceptorProvider } from './app.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MetaReducer,  provideStore } from '@ngrx/store';
@@ -20,7 +18,7 @@ const metaReducers: Array<MetaReducer<any, any>> = [
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    importProvidersFrom(HttpClientModule),
+    provideHttpClient(withInterceptorsFromDi()),
     appInterceptorProvider,
     provideAnimationsAsync(),
     provideStore({ cart: cartReducer }, { metaReducers }),
