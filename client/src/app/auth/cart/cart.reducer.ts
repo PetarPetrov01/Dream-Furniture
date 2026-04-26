@@ -33,12 +33,6 @@ export const cartReducer: ActionReducer<StateProduct[], Action>  = createReducer
   on(actions.resetState,(state) => initial)
 );
 
-export function testMetaReducer(reducer: ActionReducer<any>): ActionReducer<any>{
-    return function(state, action) {
-        return reducer(state, action);
-      };
-}
-
 export function localStorageSyncReducer(reducer: ActionReducer<StateProduct[]>): ActionReducer<StateProduct[],Action> {
     return localStorageSync({keys: ['cart'], rehydrate: true})(reducer);
 }

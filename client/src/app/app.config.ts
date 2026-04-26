@@ -11,12 +11,10 @@ import { MetaReducer,  provideStore } from '@ngrx/store';
 import {
   cartReducer,
   localStorageSyncReducer,
-  testMetaReducer,
 } from './auth/cart/cart.reducer';
 
 const metaReducers: Array<MetaReducer<any, any>> = [
   localStorageSyncReducer,
-  testMetaReducer,
 ];
 
 export const appConfig: ApplicationConfig = {
