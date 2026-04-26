@@ -27,7 +27,6 @@ import { NotificationService } from '../../shared/notification/notification.serv
         CommonModule,
         FormsModule,
         RouterLink,
-        DeleteDialogComponent,
         DateFormatterPipe,
         FloorPricePipe,
         DecimalSlicePipe,
