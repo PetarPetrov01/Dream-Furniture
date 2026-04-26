@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -18,14 +18,14 @@ import { CartState } from '../../types/State';
     styleUrl: './header.component.css'
 })
 export class HeaderComponent {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private store = inject<Store<CartState>>(Store);
+  location = inject(Location);
+
   cartQuantity: number = 0;
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private store: Store<CartState>,
-    public location: Location
-  ) {
+  constructor() {
     this.store.select('cart').subscribe((prods) => {
       this.cartQuantity = prods.reduce(
         (acc, prod) => (acc += prod.quantity),

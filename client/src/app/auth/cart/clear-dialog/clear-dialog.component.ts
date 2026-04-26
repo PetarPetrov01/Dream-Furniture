@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -25,11 +25,9 @@ import * as CartActions from '../cart.actions'
     ]
 })
 export class ClearDialogComponent {
-  subscription: Subscription | null = null;
+  private store = inject(Store);
 
-  constructor(
-    private store: Store
-  ) {}
+  subscription: Subscription | null = null;
 
   onConfirm() {
    this.store.dispatch(CartActions.resetState());

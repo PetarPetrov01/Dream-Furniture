@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -31,12 +31,10 @@ export interface DialogData {
     ]
 })
 export class RemoveDialogComponent {
-  subscription: Subscription | null = null;
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  private store = inject(Store);
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private store: Store
-  ) {}
+  subscription: Subscription | null = null;
 
   onConfirm() {
    this.store.dispatch(CartActions.removeItem({productId: this.data._id}));

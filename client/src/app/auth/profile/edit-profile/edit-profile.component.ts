@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -32,7 +32,9 @@ import { EmailValidateDirective } from '../../../shared/validators/email-validat
     styleUrl: './edit-profile.component.css'
 })
 export class EditProfileComponent implements OnInit {
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+
 
   editForm = this.fb.group({
     username: ['', Validators.required],

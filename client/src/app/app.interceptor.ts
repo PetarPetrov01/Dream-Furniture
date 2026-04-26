@@ -1,4 +1,4 @@
-import { Injectable, Provider } from '@angular/core';
+import { Injectable, Provider, inject } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -12,11 +12,10 @@ const { appUrl } = environment;
 
 @Injectable()
 export class AppInterceptor implements HttpInterceptor {
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private errorService: ErrorService
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private errorService = inject(ErrorService);
+
 
   intercept(
     req: HttpRequest<any>,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../shared/auth.service';
@@ -13,10 +13,9 @@ export const cookieName = 'auth-cookie';
     providers: [CookieService]
 })
 export class AuthComponent implements OnInit {
-  constructor(
-    private cookieService: CookieService,
-    private authService: AuthService
-  ) {}
+  private cookieService = inject(CookieService);
+  private authService = inject(AuthService);
+
   ngOnInit(): void {
     const user = this.authService.getUserStorage();
     const authCookie = this.cookieService.get(cookieName);

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -35,21 +35,19 @@ import { NotificationService } from '../../shared/notification/notification.serv
     styleUrl: './product-details.component.css'
 })
 export class ProductDetailsComponent implements OnInit, OnDestroy {
+  private activated = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
+  private notificaionService = inject(NotificationService);
+  private matDialog = inject(MatDialog);
+  private router = inject(Router);
+  private store = inject<Store<CartComponent>>(Store);
+
   product: PopulatedProduct | null = null;
   productId: string = '';
   subscription: Subscription | null = null;
 
   buyQty: number = 1;
-
-  constructor(
-    private activated: ActivatedRoute,
-    private apiService: ApiService,
-    private authService: AuthService,
-    private notificaionService: NotificationService,
-    private matDialog: MatDialog,
-    private router: Router,
-    private store: Store<CartComponent>
-  ) {}
 
   ngOnInit(): void {
     this.activated.params.subscribe((params) => {

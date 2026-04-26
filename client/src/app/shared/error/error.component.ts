@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ErrorService } from './error.service';
 import { Observable } from 'rxjs';
 
@@ -10,9 +10,9 @@ import { Observable } from 'rxjs';
     styleUrl: './error.component.css'
 })
 export class ErrorComponent implements OnInit{
-  error: string | null = null;
+  private errorService = inject(ErrorService);
 
-  constructor(private errorService: ErrorService){}
+  error: string | null = null;
 
   ngOnInit(): void {
     this.errorService.error$.subscribe((err)=>{

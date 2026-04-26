@@ -26,19 +26,19 @@ import { NotificationService } from '../../shared/notification/notification.serv
     styleUrl: './cart.component.css'
 })
 export class CartComponent implements OnInit, OnDestroy {
+  private store = inject<Store<CartState>>(Store);
+  private matDialog = inject(MatDialog);
+  private authService = inject(AuthService);
+  private apiService = inject(ApiService);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
+
   products$ = new Observable<StateProduct[]>();
   products: StateProduct[] | null = null;
 
   prodsSubscription: Subscription | null = null;
 
-  constructor(
-    private store: Store<CartState>,
-    private matDialog: MatDialog,
-    private authService: AuthService,
-    private apiService: ApiService,
-    private notificationService: NotificationService,
-    private router: Router
-  ) {
+  constructor() {
     this.products$ = this.store.select('cart');
     this.prodsSubscription = this.products$.subscribe((prods) => {
       this.products = prods;

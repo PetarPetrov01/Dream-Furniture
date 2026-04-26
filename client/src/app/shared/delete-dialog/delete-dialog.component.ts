@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -26,14 +26,12 @@ export interface DialogData {
     imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent]
 })
 export class DeleteDialogComponent implements OnDestroy {
-  subscription: Subscription | null = null;
+  dialogRef = inject<MatDialogRef<DeleteDialogComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
 
-  constructor(
-    public dialogRef: MatDialogRef<DeleteDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private apiService: ApiService,
-    private router: Router
-  ) {}
+  subscription: Subscription | null = null;
 
   onConfirm() {
     this.subscription = this.apiService

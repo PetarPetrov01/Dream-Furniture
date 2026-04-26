@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -34,6 +34,11 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
     styleUrl: './add-product.component.css'
 })
 export class AddProductComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+
   editProdSubscription: Subscription | null = null;
   editProductId: string | null = null;
   isEditing: boolean = false;
@@ -62,13 +67,6 @@ export class AddProductComponent implements OnInit, OnDestroy {
     'purple',
     'pink',
   ];
-
-  constructor(
-    private fb: FormBuilder,
-    private apiService: ApiService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params) => {

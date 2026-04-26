@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 
@@ -36,6 +36,10 @@ interface PriceRange {
     styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit, OnDestroy {
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   products: APIProduct[] | [] = [];
   queryParams: Params = {};
 
@@ -79,12 +83,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       text: 'Newest first',
     },
   ];
-
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
 
   ngOnInit(): void {
     this.isLoading = true;

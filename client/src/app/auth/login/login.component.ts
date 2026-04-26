@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -25,16 +25,16 @@ import { NotificationService } from '../../shared/notification/notification.serv
     styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnDestroy {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
+
   subscription: Subscription | null;
   isLoading: boolean = false;
   showPass: boolean = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService,
-    private notificationService: NotificationService
-  ) {
+  constructor() {
     this.subscription = null;
   }
 

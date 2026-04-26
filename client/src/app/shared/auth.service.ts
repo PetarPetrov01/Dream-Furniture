@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Subscription, tap } from 'rxjs';
@@ -17,6 +17,10 @@ import { APIOrder, Order } from '../types/Order';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
+  private http = inject(HttpClient);
+  private cookieService = inject(CookieService);
+  private store = inject(Store);
+
   private user$$ = new BehaviorSubject<User | undefined>(undefined);
   public user$ = this.user$$.asObservable();
 
@@ -24,11 +28,7 @@ export class AuthService implements OnDestroy {
 
   subscription: Subscription;
 
-  constructor(
-    private http: HttpClient,
-    private cookieService: CookieService,
-    private store: Store
-  ) {
+  constructor() {
     this.subscription = this.user$$.subscribe((user) => {
       this.user = user;
     });

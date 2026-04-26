@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import {  Subscription } from 'rxjs';
 import { APIProduct } from '../../types/Product';
@@ -15,13 +15,12 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
     styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy{
+private apiService = inject(ApiService);
+
 products: APIProduct[] | [] = [];
 isLoading: boolean = false;
 
 subscription: Subscription | null = null;
-
-constructor (private apiService: ApiService){
-}
 
   ngOnInit(): void {
     this.isLoading = true;

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -26,13 +26,16 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     styleUrl: './register.component.css'
 })
 export class RegisterComponent implements OnDestroy {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   @ViewChild('registerForm') registerForm: NgForm | undefined;
   subscription: Subscription | null;
 
   isLoading: boolean = false;
   showPass: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor() {
     this.subscription = null;
   }
 
