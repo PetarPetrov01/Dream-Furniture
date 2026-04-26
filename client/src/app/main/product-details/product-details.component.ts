@@ -60,9 +60,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         next: (prod) => {
           this.product = prod;
         },
-        error: (err) => {
+        error: () => {
           this.router.navigate([`/products/${this.productId}/not-found`]);
-          console.log(err);
         },
       });
     });

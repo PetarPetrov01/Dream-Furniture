@@ -179,7 +179,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onPriceChange(caller?: string | null) {
     if (this.priceRange.lower > this.priceRange.upper) {
-      console.log(caller);
       if (caller == 'lower') {
         this.priceRange.lower = this.priceRange.upper;
       }
