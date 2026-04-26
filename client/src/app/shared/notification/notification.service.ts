@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class NotificationService {
   notification$$ = new BehaviorSubject<null | string>(null);
-  notificaiton$ = this.notification$$.asObservable();
+  notification$ = this.notification$$.asObservable();
  
   constructor() {}
 

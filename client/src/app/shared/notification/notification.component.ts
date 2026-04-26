@@ -15,7 +15,7 @@ export class NotificationComponent implements OnInit {
   notificationService = inject(NotificationService);
 
   ngOnInit(): void {
-    this.notificationService.notificaiton$.subscribe((notification) => {
+    this.notificationService.notification$.subscribe((notification) => {
       this.notification = notification;
     });
   }
