@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
-
-import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { ApiService } from '../../shared/api.service';
@@ -22,44 +22,46 @@ import * as CartActions from '../cart/cart.actions';
     templateUrl: './wishlist.component.html',
     styleUrl: './wishlist.component.css'
 })
-export class WishlistComponent implements OnInit, OnDestroy {
+export class WishlistComponent implements OnInit {
   authService = inject(AuthService);
   apiService = inject(ApiService);
   store = inject(Store<CartState>);
 
   router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  subscription: Subscription | null = null;
   wishlist: PopulatedProduct[] | [] = [];
 
   ngOnInit(): void {
-    this.subscription = this.fetchWishList();
+    this.fetchWishList();
   }
 
   fetchWishList() {
-    return this.authService.getWishlist().subscribe((wishlist) => {
-      this.wishlist = wishlist;
-    });
+    this.authService.getWishlist()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((wishlist) => {
+        this.wishlist = wishlist;
+      });
   }
 
   onRemove(prodId: string) {
-    this.apiService.toggleWishList(prodId).subscribe((user) => {
-      //sync user
-      this.authService.setUserStorage(user);
-      this.authService.setUserSubject(user);
-
-      //sync list
-      this.subscription = this.fetchWishList();
-    });
+    this.apiService.toggleWishList(prodId)
+      .pipe(
+        switchMap((user) => {
+          // sync user
+          this.authService.setUserStorage(user);
+          this.authService.setUserSubject(user);
+          // refetch list
+          return this.authService.getWishlist();
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((wishlist) => {
+        this.wishlist = wishlist;
+      });
   }
 
   onAddToCart(product: PopulatedProduct) {
     this.store.dispatch(CartActions.addItem({ product, qty: 1 }));
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
   }
 }

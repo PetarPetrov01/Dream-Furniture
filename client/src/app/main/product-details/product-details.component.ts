@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Subscription, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { ApiService } from '../../shared/api.service';
@@ -34,7 +35,7 @@ import { NotificationService } from '../../shared/notification/notification.serv
     templateUrl: './product-details.component.html',
     styleUrl: './product-details.component.css'
 })
-export class ProductDetailsComponent implements OnInit, OnDestroy {
+export class ProductDetailsComponent implements OnInit {
   private activated = inject(ActivatedRoute);
   private apiService = inject(ApiService);
   private authService = inject(AuthService);
@@ -42,25 +43,29 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   private matDialog = inject(MatDialog);
   private router = inject(Router);
   private store = inject<Store<CartComponent>>(Store);
+  private destroyRef = inject(DestroyRef);
 
   product: PopulatedProduct | null = null;
   productId: string = '';
-  subscription: Subscription | null = null;
 
   buyQty: number = 1;
 
   ngOnInit(): void {
-    this.activated.params.subscribe((params) => {
-      this.productId = params['id'];
-      this.subscription = this.apiService.getProduct(this.productId).subscribe({
-        next: (prod) => {
-          this.product = prod;
-        },
-        error: () => {
-          this.router.navigate([`/products/${this.productId}/not-found`]);
-        },
+    this.activated.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.productId = params['id'];
+        this.apiService.getProduct(this.productId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (prod) => {
+              this.product = prod;
+            },
+            error: () => {
+              this.router.navigate([`/products/${this.productId}/not-found`]);
+            },
+          });
       });
-    });
   }
 
   get isUser() {
@@ -98,11 +103,13 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   toggleWishlist() {
-    this.apiService.toggleWishList(this.productId).subscribe((user) => {
-      this.router.navigate([`/products/${this.productId}`]);
-      this.authService.setUserStorage(user);
-      this.authService.setUserSubject(user);
-    });
+    this.apiService.toggleWishList(this.productId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.router.navigate([`/products/${this.productId}`]);
+        this.authService.setUserStorage(user);
+        this.authService.setUserSubject(user);
+      });
   }
 
   addToCart() {
@@ -139,9 +146,5 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         _id: this.product?._id,
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 }

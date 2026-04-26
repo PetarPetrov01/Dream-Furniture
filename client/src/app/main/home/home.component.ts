@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../shared/api.service';
-import {  Subscription } from 'rxjs';
 import { APIProduct } from '../../types/Product';
 
 import { RouterLink } from '@angular/router';
@@ -14,26 +14,24 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit, OnDestroy{
-private apiService = inject(ApiService);
+export class HomeComponent implements OnInit {
+  private apiService = inject(ApiService);
+  private destroyRef = inject(DestroyRef);
 
-products: APIProduct[] | [] = [];
-isLoading: boolean = false;
-
-subscription: Subscription | null = null;
+  products: APIProduct[] | [] = [];
+  isLoading: boolean = false;
 
   ngOnInit(): void {
     this.isLoading = true;
-    
-    this.subscription = this.apiService.getProducts({limit: 3, sort: 'createdAt:asc'}).subscribe(products=>{
-      setTimeout(()=>{
-        this.products = products;
-        this.isLoading = false;
-      },2000)
-    })
-  }
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe()
+    this.apiService
+      .getProducts({ limit: 3, sort: 'createdAt:asc' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((products) => {
+        setTimeout(() => {
+          this.products = products;
+          this.isLoading = false;
+        }, 2000);
+      });
   }
 }

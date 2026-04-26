@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Subscription } from 'rxjs';
 import { AuthService } from '../../shared/auth.service';
 
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
@@ -18,23 +18,24 @@ import { APIProduct } from '../../types/Product';
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit {
   user: User | undefined;
   products: APIProduct[] | [] = [];
-
-  userSubscription: Subscription | null = null;
-  postsSubscription: Subscription | null = null;
 
   authService = inject(AuthService);
   matDialog = inject(MatDialog);
   router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.userSubscription = this.authService.user$.subscribe((user) => {
-      this.user = user;
-    });
-    this.postsSubscription = this.authService
+    this.authService.user$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.user = user;
+      });
+    this.authService
       .getOwnProducts()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((products) => {
         this.products = products;
       });
@@ -63,15 +64,5 @@ export class ProfileComponent implements OnInit, OnDestroy {
         _id: product?._id,
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-
-    if (this.postsSubscription) {
-      this.postsSubscription.unsubscribe();
-    }
   }
 }

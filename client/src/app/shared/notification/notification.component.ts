@@ -1,5 +1,5 @@
-
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from './notification.service';
 
 @Component({
@@ -12,15 +12,17 @@ export class NotificationComponent implements OnInit {
   notification: null | string = null;
 
   notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.notificationService.notification$.subscribe((notification) => {
-      this.notification = notification;
-    });
+    this.notificationService.notification$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((notification) => {
+        this.notification = notification;
+      });
   }
 
-  clearNotification(){
+  clearNotification() {
     this.notificationService.clearNotification();
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -8,10 +8,9 @@ import {
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import * as CartActions from '../cart.actions'
+import * as CartActions from '../cart.actions';
 
 export interface DialogData {
   productName: string;
@@ -34,9 +33,7 @@ export class RemoveDialogComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);
   private store = inject(Store);
 
-  subscription: Subscription | null = null;
-
   onConfirm() {
-   this.store.dispatch(CartActions.removeItem({productId: this.data._id}));
+    this.store.dispatch(CartActions.removeItem({ productId: this.data._id }));
   }
 }

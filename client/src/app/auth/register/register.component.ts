@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
+import { Component, DestroyRef, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../shared/auth.service';
 
@@ -25,19 +25,15 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     templateUrl: './register.component.html',
     styleUrl: './register.component.css'
 })
-export class RegisterComponent implements OnDestroy {
+export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('registerForm') registerForm: NgForm | undefined;
-  subscription: Subscription | null;
 
   isLoading: boolean = false;
   showPass: boolean = false;
-
-  constructor() {
-    this.subscription = null;
-  }
 
   handleRegister() {
     if (this.registerForm == undefined || this.registerForm.invalid) {
@@ -57,14 +53,15 @@ export class RegisterComponent implements OnDestroy {
 
     this.isLoading = true;
 
-    this.subscription = this.authService
+    this.authService
       .register(email, username, password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.router.navigate(['/']);
           this.isLoading = false;
         },
-        error: (err) => {
+        error: () => {
           //mock delay to visualize loader
           setTimeout(() => {
             this.isLoading = false;
@@ -75,9 +72,5 @@ export class RegisterComponent implements OnDestroy {
 
   toggleShowPass() {
     this.showPass = !this.showPass;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 }

@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
@@ -27,20 +28,25 @@ export class OrdersComponent implements OnInit {
 
   authService = inject(AuthService);
   router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.fetchOrders();
   }
 
   fetchOrders() {
-    this.authService.getOrders().subscribe((orders) => {
-      this.orders = orders;
-    });
+    this.authService.getOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((orders) => {
+        this.orders = orders;
+      });
   }
 
   handleDelete(orderId: string) {
-    this.authService.deleteOrder(orderId).subscribe((res) => {
-      this.fetchOrders();
-    });
+    this.authService.deleteOrder(orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.fetchOrders();
+      });
   }
 }

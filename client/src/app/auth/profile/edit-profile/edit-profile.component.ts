@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -34,7 +35,7 @@ import { EmailValidateDirective } from '../../../shared/validators/email-validat
 export class EditProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-
+  private destroyRef = inject(DestroyRef);
 
   editForm = this.fb.group({
     username: ['', Validators.required],
@@ -42,12 +43,14 @@ export class EditProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.authService.user$.subscribe((user) => {
-      this.editForm.patchValue({
-        username: user?.username,
-        email: user?.email,
+    this.authService.user$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.editForm.patchValue({
+          username: user?.username,
+          email: user?.email,
+        });
       });
-    });
   }
 
   onConfirm() {

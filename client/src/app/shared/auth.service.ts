@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, Subscription, tap } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 
 import { cookieName } from '../auth/auth.component';
@@ -16,7 +16,7 @@ import { APIOrder, Order } from '../types/Order';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
+export class AuthService {
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
   private store = inject(Store);
@@ -24,14 +24,8 @@ export class AuthService implements OnDestroy {
   private user$$ = new BehaviorSubject<User | undefined>(undefined);
   public user$ = this.user$$.asObservable();
 
-  user: User | undefined;
-
-  subscription: Subscription;
-
-  constructor() {
-    this.subscription = this.user$$.subscribe((user) => {
-      this.user = user;
-    });
+  get user(): User | undefined {
+    return this.user$$.value;
   }
 
   get isLogged(): boolean {
@@ -122,9 +116,5 @@ export class AuthService implements OnDestroy {
     this.store.dispatch(CartActions.resetState());
 
     this.http.get('/api/auth/logout').subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

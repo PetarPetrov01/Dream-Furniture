@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -7,10 +7,9 @@ import {
   MatDialogContent,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import * as CartActions from '../cart.actions'
+import * as CartActions from '../cart.actions';
 
 @Component({
     selector: 'app-clear-dialog',
@@ -27,9 +26,7 @@ import * as CartActions from '../cart.actions'
 export class ClearDialogComponent {
   private store = inject(Store);
 
-  subscription: Subscription | null = null;
-
   onConfirm() {
-   this.store.dispatch(CartActions.resetState());
+    this.store.dispatch(CartActions.resetState());
   }
 }

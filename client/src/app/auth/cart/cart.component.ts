@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { AuthService } from '../../shared/auth.service';
@@ -25,7 +26,7 @@ import { NotificationService } from '../../shared/notification/notification.serv
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.css'
 })
-export class CartComponent implements OnInit, OnDestroy {
+export class CartComponent {
   private store = inject<Store<CartState>>(Store);
   private matDialog = inject(MatDialog);
   private authService = inject(AuthService);
@@ -33,16 +34,15 @@ export class CartComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private router = inject(Router);
 
-  products$ = new Observable<StateProduct[]>();
+  products$: Observable<StateProduct[]> = this.store.select('cart');
   products: StateProduct[] | null = null;
 
-  prodsSubscription: Subscription | null = null;
-
   constructor() {
-    this.products$ = this.store.select('cart');
-    this.prodsSubscription = this.products$.subscribe((prods) => {
-      this.products = prods;
-    });
+    this.products$
+      .pipe(takeUntilDestroyed())
+      .subscribe((prods) => {
+        this.products = prods;
+      });
   }
 
   handleIncreaseQuantity(currentProduct: StateProduct) {
@@ -70,11 +70,13 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   toggleWishlist(currentProduct: StateProduct) {
-    this.apiService.toggleWishList(currentProduct._id).subscribe((user) => {
-      this.router.navigate([`/cart`]);
-      this.authService.setUserStorage(user);
-      this.authService.setUserSubject(user);
-    });
+    this.apiService.toggleWishList(currentProduct._id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.router.navigate([`/cart`]);
+        this.authService.setUserStorage(user);
+        this.authService.setUserSubject(user);
+      });
   }
 
   handleRemove(currentProduct: StateProduct) {
@@ -109,12 +111,14 @@ export class CartComponent implements OnInit, OnDestroy {
       };
     });
 
-    this.authService.completeOrder(order!).subscribe((order) => {
-      this.store.dispatch(CartActions.resetState());
-      this.notificationService.setNotification(
-        `Your order №${order._id.slice(-8)} has been approved.`
-      );
-    });
+    this.authService.completeOrder(order!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((order) => {
+        this.store.dispatch(CartActions.resetState());
+        this.notificationService.setNotification(
+          `Your order №${order._id.slice(-8)} has been approved.`
+        );
+      });
   }
 
   get totalCount() {
@@ -134,11 +138,5 @@ export class CartComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnInit(): void {}
-
-  ngOnDestroy(): void {
-    if (this.prodsSubscription) {
-      this.prodsSubscription.unsubscribe();
-    }
-  }
+  private destroyRef = inject(DestroyRef);
 }

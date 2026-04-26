@@ -1,9 +1,8 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../shared/auth.service';
 import { EmailValidateDirective } from '../../shared/validators/email-validator.directive';
@@ -24,19 +23,15 @@ import { NotificationService } from '../../shared/notification/notification.serv
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
-  subscription: Subscription | null;
   isLoading: boolean = false;
   showPass: boolean = false;
-
-  constructor() {
-    this.subscription = null;
-  }
 
   loginForm = this.fb.group({
     email: ['', [Validators.required]],
@@ -53,28 +48,27 @@ export class LoginComponent implements OnDestroy {
 
     this.loginForm.reset();
 
-    this.authService.login(email!, password!).subscribe({
-      next: (user) => {
-        this.router.navigate(['/']);
-        this.isLoading = false;
-        this.notificationService.setNotification(
-          `Successfully logged in as ${user.username}`
-        );
-      },
-      error: () => {
-        //mock delay to visualize loader
-        setTimeout(() => {
+    this.authService
+      .login(email!, password!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.router.navigate(['/']);
           this.isLoading = false;
-        }, 2000);
-      },
-    });
+          this.notificationService.setNotification(
+            `Successfully logged in as ${user.username}`
+          );
+        },
+        error: () => {
+          //mock delay to visualize loader
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 2000);
+        },
+      });
   }
 
-  toggleShowPass(){
+  toggleShowPass() {
     this.showPass = !this.showPass;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 }
