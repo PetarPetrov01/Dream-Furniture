@@ -5,7 +5,7 @@ interface OrderProduct {
   count: number;
 }
 
-export interface Order extends Array<OrderProduct> {}
+export type Order = OrderProduct[];
 
 export interface APIOrderProduct extends Omit<OrderProduct,'product'>{
   _id: string,
