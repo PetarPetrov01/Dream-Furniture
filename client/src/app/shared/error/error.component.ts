@@ -4,11 +4,10 @@ import { Observable } from 'rxjs';
 import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-error',
-  standalone: true,
-  imports: [NgIf],
-  templateUrl: './error.component.html',
-  styleUrl: './error.component.css'
+    selector: 'app-error',
+    imports: [NgIf],
+    templateUrl: './error.component.html',
+    styleUrl: './error.component.css'
 })
 export class ErrorComponent implements OnInit{
   error: string | null = null;

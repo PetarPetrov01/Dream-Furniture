@@ -12,11 +12,10 @@ import { AuthService } from '../../shared/auth.service';
 import { CartState } from '../../types/State';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgIf, MatMenuModule, MatBadgeModule],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css',
+    selector: 'app-header',
+    imports: [RouterLink, RouterLinkActive, NgIf, MatMenuModule, MatBadgeModule],
+    templateUrl: './header.component.html',
+    styleUrl: './header.component.css'
 })
 export class HeaderComponent {
   cartQuantity: number = 0;

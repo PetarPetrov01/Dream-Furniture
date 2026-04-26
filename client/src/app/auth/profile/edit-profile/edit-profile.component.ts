@@ -17,21 +17,20 @@ import { CommonModule } from '@angular/common';
 import { EmailValidateDirective } from '../../../shared/validators/email-validator.directive';
 
 @Component({
-  selector: 'app-edit-profile',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatInputModule,
-    EmailValidateDirective,
-  ],
-  templateUrl: './edit-profile.component.html',
-  styleUrl: './edit-profile.component.css',
+    selector: 'app-edit-profile',
+    imports: [
+        CommonModule,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        FormsModule,
+        MatInputModule,
+        EmailValidateDirective,
+    ],
+    templateUrl: './edit-profile.component.html',
+    styleUrl: './edit-profile.component.css'
 })
 export class EditProfileComponent implements OnInit {
   constructor(private fb: FormBuilder, private authService: AuthService) {}

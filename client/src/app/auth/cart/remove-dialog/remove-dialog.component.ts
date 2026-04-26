@@ -19,17 +19,16 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'remove-dialog',
-  templateUrl: 'remove-dialog.component.html',
-  styleUrl: 'remove-dialog.component.css',
-  standalone: true,
-  imports: [
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-  ],
+    selector: 'remove-dialog',
+    templateUrl: 'remove-dialog.component.html',
+    styleUrl: 'remove-dialog.component.css',
+    imports: [
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+    ]
 })
 export class RemoveDialogComponent {
   subscription: Subscription | null = null;

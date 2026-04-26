@@ -20,11 +20,10 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'delete-dialog',
-  templateUrl: 'delete-dialog.component.html',
-  styleUrl: 'delete-dialog.component.css',
-  standalone: true,
-  imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+    selector: 'delete-dialog',
+    templateUrl: 'delete-dialog.component.html',
+    styleUrl: 'delete-dialog.component.css',
+    imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent]
 })
 export class DeleteDialogComponent implements OnDestroy {
   subscription: Subscription | null = null;

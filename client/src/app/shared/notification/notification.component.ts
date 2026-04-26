@@ -3,11 +3,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { NotificationService } from './notification.service';
 
 @Component({
-  selector: 'app-notification',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './notification.component.html',
-  styleUrl: './notification.component.css',
+    selector: 'app-notification',
+    imports: [CommonModule],
+    templateUrl: './notification.component.html',
+    styleUrl: './notification.component.css'
 })
 export class NotificationComponent implements OnInit {
   notification: null | string = null;

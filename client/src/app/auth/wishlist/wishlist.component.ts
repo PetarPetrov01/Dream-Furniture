@@ -17,11 +17,10 @@ import { CartState } from '../../types/State';
 import * as CartActions from '../cart/cart.actions';
 
 @Component({
-  selector: 'app-wishlist',
-  standalone: true,
-  imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
-  templateUrl: './wishlist.component.html',
-  styleUrl: './wishlist.component.css',
+    selector: 'app-wishlist',
+    imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
+    templateUrl: './wishlist.component.html',
+    styleUrl: './wishlist.component.css'
 })
 export class WishlistComponent implements OnInit, OnDestroy {
   authService = inject(AuthService);

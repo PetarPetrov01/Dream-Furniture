@@ -12,19 +12,18 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [
-    RouterLink,
-    FormsModule,
-    MatchPasswordsDirective,
-    EmailValidateDirective,
-    CommonModule,
-    LoaderComponent,
-    LazyLoadImageModule,
-  ],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css',
+    selector: 'app-register',
+    imports: [
+        RouterLink,
+        FormsModule,
+        MatchPasswordsDirective,
+        EmailValidateDirective,
+        CommonModule,
+        LoaderComponent,
+        LazyLoadImageModule,
+    ],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.css'
 })
 export class RegisterComponent implements OnDestroy {
   @ViewChild('registerForm') registerForm: NgForm | undefined;

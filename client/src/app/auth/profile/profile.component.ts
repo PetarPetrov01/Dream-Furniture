@@ -13,11 +13,10 @@ import { User } from '../../types/User';
 import { APIProduct } from '../../types/Product';
 
 @Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css',
+    selector: 'app-profile',
+    imports: [CommonModule, RouterLink],
+    templateUrl: './profile.component.html',
+    styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   user: User | undefined;

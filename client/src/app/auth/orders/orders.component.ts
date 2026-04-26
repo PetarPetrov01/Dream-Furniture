@@ -11,17 +11,16 @@ import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { APIOrder } from '../../types/Order';
 
 @Component({
-  selector: 'app-orders',
-  standalone: true,
-  imports: [
-    CommonModule,
-    DateFormatterPipe,
-    FloorPricePipe,
-    DecimalSlicePipe,
-    RouterLink,
-  ],
-  templateUrl: './orders.component.html',
-  styleUrl: './orders.component.css',
+    selector: 'app-orders',
+    imports: [
+        CommonModule,
+        DateFormatterPipe,
+        FloorPricePipe,
+        DecimalSlicePipe,
+        RouterLink,
+    ],
+    templateUrl: './orders.component.html',
+    styleUrl: './orders.component.css'
 })
 export class OrdersComponent implements OnInit {
   orders: APIOrder[] | [] = [];

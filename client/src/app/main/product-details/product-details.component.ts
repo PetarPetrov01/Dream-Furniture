@@ -22,19 +22,18 @@ import * as CartActions from '../../auth/cart/cart.actions';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
-  selector: 'app-product-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterLink,
-    DeleteDialogComponent,
-    DateFormatterPipe,
-    FloorPricePipe,
-    DecimalSlicePipe,
-  ],
-  templateUrl: './product-details.component.html',
-  styleUrl: './product-details.component.css',
+    selector: 'app-product-details',
+    imports: [
+        CommonModule,
+        FormsModule,
+        RouterLink,
+        DeleteDialogComponent,
+        DateFormatterPipe,
+        FloorPricePipe,
+        DecimalSlicePipe,
+    ],
+    templateUrl: './product-details.component.html',
+    styleUrl: './product-details.component.css'
 })
 export class ProductDetailsComponent implements OnInit, OnDestroy {
   product: PopulatedProduct | null = null;

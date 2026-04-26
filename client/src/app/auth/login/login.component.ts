@@ -12,18 +12,17 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    RouterLink,
-    ReactiveFormsModule,
-    EmailValidateDirective,
-    CommonModule,
-    LoaderComponent,
-    LazyLoadImageModule,
-  ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+    selector: 'app-login',
+    imports: [
+        RouterLink,
+        ReactiveFormsModule,
+        EmailValidateDirective,
+        CommonModule,
+        LoaderComponent,
+        LazyLoadImageModule,
+    ],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnDestroy {
   subscription: Subscription | null;

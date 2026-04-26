@@ -6,11 +6,10 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import {MatButtonModule} from '@angular/material/button'
 
 @Component({
-  selector: 'app-not-found',
-  standalone: true,
-  imports: [NgIf,MatButtonModule, RouterLink],
-  templateUrl: './not-found.component.html',
-  styleUrl: './not-found.component.css'
+    selector: 'app-not-found',
+    imports: [NgIf, MatButtonModule, RouterLink],
+    templateUrl: './not-found.component.html',
+    styleUrl: './not-found.component.css'
 })
 export class NotFoundComponent implements OnInit{
   private activated = inject(ActivatedRoute);

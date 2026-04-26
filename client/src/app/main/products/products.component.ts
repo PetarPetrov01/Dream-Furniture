@@ -21,20 +21,19 @@ interface PriceRange {
 }
 
 @Component({
-  selector: 'app-products',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    LoaderCardComponent,
-    MatChipsModule,
-    MatSliderModule,
-    FormsModule,
-    FloorPricePipe,
-    DecimalSlicePipe,
-  ],
-  templateUrl: './products.component.html',
-  styleUrl: './products.component.css',
+    selector: 'app-products',
+    imports: [
+        CommonModule,
+        RouterLink,
+        LoaderCardComponent,
+        MatChipsModule,
+        MatSliderModule,
+        FormsModule,
+        FloorPricePipe,
+        DecimalSlicePipe,
+    ],
+    templateUrl: './products.component.html',
+    styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   products: APIProduct[] | [] = [];

@@ -21,19 +21,18 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
-  selector: 'app-add-product',
-  standalone: true,
-  imports: [
-    MatSelectModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    NgIf,
-    LazyLoadImageModule,
-    LoaderComponent
-  ],
-  templateUrl: './add-product.component.html',
-  styleUrl: './add-product.component.css',
+    selector: 'app-add-product',
+    imports: [
+        MatSelectModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        NgIf,
+        LazyLoadImageModule,
+        LoaderComponent
+    ],
+    templateUrl: './add-product.component.html',
+    styleUrl: './add-product.component.css'
 })
 export class AddProductComponent implements OnInit, OnDestroy {
   editProdSubscription: Subscription | null = null;

@@ -9,11 +9,10 @@ import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+    selector: 'app-home',
+    imports: [CommonModule, RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy{
 products: APIProduct[] | [] = [];

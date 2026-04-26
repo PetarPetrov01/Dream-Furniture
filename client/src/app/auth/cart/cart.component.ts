@@ -20,11 +20,10 @@ import * as CartActions from '../cart/cart.actions';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
-  selector: 'app-cart',
-  standalone: true,
-  imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
-  templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css',
+    selector: 'app-cart',
+    imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
+    templateUrl: './cart.component.html',
+    styleUrl: './cart.component.css'
 })
 export class CartComponent implements OnInit, OnDestroy {
   products$ = new Observable<StateProduct[]>();

@@ -6,12 +6,11 @@ import { AuthService } from '../shared/auth.service';
 export const cookieName = 'auth-cookie';
 
 @Component({
-  selector: 'app-auth',
-  standalone: true,
-  imports: [],
-  templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css',
-  providers: [CookieService],
+    selector: 'app-auth',
+    imports: [],
+    templateUrl: './auth.component.html',
+    styleUrl: './auth.component.css',
+    providers: [CookieService]
 })
 export class AuthComponent implements OnInit {
   constructor(
