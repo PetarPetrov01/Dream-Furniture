@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   FormBuilder,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -28,7 +27,6 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
     MatSelectModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    FormsModule,
     MatInputModule,
     NgIf,
     LazyLoadImageModule,
