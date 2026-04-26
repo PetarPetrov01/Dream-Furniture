@@ -91,12 +91,11 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   handleClearCart() {
-    this.matDialog.open(ClearDiaologComponent),
-      {
-        width: '300px',
-        enterAnimationDuration: '300ms',
-        exitAnimationDuration: '200ms',
-      };
+    this.matDialog.open(ClearDiaologComponent, {
+      width: '300px',
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '200ms',
+    });
   }
 
   handleCompleteOrder() {
