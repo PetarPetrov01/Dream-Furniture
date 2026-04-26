@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Store } from '@ngrx/store';
-import { ClearDiaologComponent } from './clear-dialog.component';
+import { ClearDialogComponent } from './clear-dialog.component';
 
-describe('ClearDiaologComponent', () => {
-  let component: ClearDiaologComponent;
-  let fixture: ComponentFixture<ClearDiaologComponent>;
+describe('ClearDialogComponent', () => {
+  let component: ClearDialogComponent;
+  let fixture: ComponentFixture<ClearDialogComponent>;
   let storeMock: jasmine.SpyObj<Store>;
 
   beforeEach(async () => {
     storeMock = jasmine.createSpyObj('Store', ['dispatch']);
 
     await TestBed.configureTestingModule({
-      imports: [ClearDiaologComponent],
+      imports: [ClearDialogComponent],
       providers: [
         {
           provide: Store,
@@ -21,7 +21,7 @@ describe('ClearDiaologComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ClearDiaologComponent);
+    fixture = TestBed.createComponent(ClearDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

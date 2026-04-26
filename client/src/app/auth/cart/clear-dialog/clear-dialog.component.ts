@@ -25,7 +25,7 @@ import * as CartActions from '../cart.actions'
     MatDialogContent,
   ],
 })
-export class ClearDiaologComponent {
+export class ClearDialogComponent {
   subscription: Subscription | null = null;
 
   constructor(

@@ -13,7 +13,7 @@ import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 import { RemoveDialogComponent } from './remove-dialog/remove-dialog.component';
-import { ClearDiaologComponent } from './clear-dialog/clear-dialog.component';
+import { ClearDialogComponent } from './clear-dialog/clear-dialog.component';
 
 import { CartState, StateProduct } from '../../types/State';
 import * as CartActions from '../cart/cart.actions';
@@ -91,7 +91,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   handleClearCart() {
-    this.matDialog.open(ClearDiaologComponent, {
+    this.matDialog.open(ClearDialogComponent, {
       width: '300px',
       enterAnimationDuration: '300ms',
       exitAnimationDuration: '200ms',
