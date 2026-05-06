@@ -24,6 +24,7 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
+import { CART_MAX_QTY, DIALOG_DEFAULTS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-product-details',
@@ -93,7 +94,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addQty() {
-    if (this.buyQty >= 50) {
+    if (this.buyQty >= CART_MAX_QTY) {
       return;
     }
     this.buyQty += 1;
@@ -129,19 +130,17 @@ export class ProductDetailsComponent implements OnInit {
     if (
       !this.buyQty ||
       this.buyQty < 1 ||
-      this.buyQty > 50 ||
+      this.buyQty > CART_MAX_QTY ||
       Number.isInteger(this.buyQty) == false
     ) {
       this.buyQty = 1;
     }
   }
 
-  onDelete(enterAnimationDuration: string, exitAnimationDuration: string) {
+  onDelete() {
     const prod = this.product();
     this.matDialog.open(DeleteDialogComponent, {
-      width: '300px',
-      enterAnimationDuration,
-      exitAnimationDuration,
+      ...DIALOG_DEFAULTS,
       data: {
         productName: prod?.name,
         _id: prod?._id,

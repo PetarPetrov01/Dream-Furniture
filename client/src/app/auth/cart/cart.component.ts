@@ -15,6 +15,7 @@ import { ClearDialogComponent } from './clear-dialog/clear-dialog.component';
 import { StateProduct } from '../../types/State';
 import { CartStore } from './cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
+import { DIALOG_DEFAULTS } from '../../shared/ui-constants';
 
 @Component({
     selector: 'app-cart',
@@ -42,9 +43,7 @@ export class CartComponent {
   handleDecreaseQuantity(currentProduct: StateProduct) {
     if (currentProduct.quantity <= 1) {
       this.matDialog.open(RemoveDialogComponent, {
-        width: '300px',
-        enterAnimationDuration: '300ms',
-        exitAnimationDuration: '200ms',
+        ...DIALOG_DEFAULTS,
         data: {
           productName: currentProduct?.name,
           _id: currentProduct?._id,
@@ -67,9 +66,7 @@ export class CartComponent {
 
   handleRemove(currentProduct: StateProduct) {
     this.matDialog.open(RemoveDialogComponent, {
-      width: '300px',
-      enterAnimationDuration: '300ms',
-      exitAnimationDuration: '200ms',
+      ...DIALOG_DEFAULTS,
       data: {
         productName: currentProduct?.name,
         _id: currentProduct?._id,
@@ -78,11 +75,7 @@ export class CartComponent {
   }
 
   handleClearCart() {
-    this.matDialog.open(ClearDialogComponent, {
-      width: '300px',
-      enterAnimationDuration: '300ms',
-      exitAnimationDuration: '200ms',
-    });
+    this.matDialog.open(ClearDialogComponent, DIALOG_DEFAULTS);
   }
 
   handleCompleteOrder() {

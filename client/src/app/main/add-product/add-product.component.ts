@@ -23,7 +23,6 @@ import { MatInputModule } from '@angular/material/input';
 import { ApiService } from '../../shared/api.service';
 
 import { Product } from '../../types/Product';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
@@ -33,7 +32,6 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    LazyLoadImageModule,
     LoaderComponent,
   ],
   templateUrl: './add-product.component.html',

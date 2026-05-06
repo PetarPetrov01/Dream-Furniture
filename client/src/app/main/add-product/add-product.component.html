@@ -1,5 +1,8 @@
 <section class="add-product">
-  <div class="container" lazyLoad="assets/images/add-prod-back.jpg">
+  <div
+    class="container"
+    style="background-image: url('assets/images/add-prod-back.jpg')"
+  >
     <div class="form-wrapper">
       <h1>{{ isEditing() ? "Edit" : "Add" }} product</h1>
       <form action="" class="add-product" [formGroup]="addProductForm">

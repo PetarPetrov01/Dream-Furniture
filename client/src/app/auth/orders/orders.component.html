@@ -25,7 +25,7 @@
                 <h3><span>№ {{order._id.slice(-8)}}</span> - Processing</h3>
                 <p>{{ order.createdAt | dateFormatter }}</p>
               </div>
-              @for (product of order.products; track product) {
+              @for (product of order.products; track product._id) {
                 <div class="product-card">
                   <div class="media">
                     <a [routerLink]="'/products/' + product.product._id">

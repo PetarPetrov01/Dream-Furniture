@@ -18,6 +18,7 @@ import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.
 
 import { User } from '../../types/User';
 import { APIProduct } from '../../types/Product';
+import { DIALOG_DEFAULTS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-profile',
@@ -58,15 +59,9 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  onDelete(
-    product: APIProduct,
-    enterAnimationDuration: string,
-    exitAnimationDuration: string
-  ) {
+  onDelete(product: APIProduct) {
     this.matDialog.open(DeleteDialogComponent, {
-      width: '300px',
-      enterAnimationDuration,
-      exitAnimationDuration,
+      ...DIALOG_DEFAULTS,
       data: {
         productName: product?.name,
         _id: product?._id,

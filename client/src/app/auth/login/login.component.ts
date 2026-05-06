@@ -13,8 +13,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/auth.service';
 import { EmailValidateDirective } from '../../shared/validators/email-validator.directive';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { NotificationService } from '../../shared/notification/notification.service';
+import { AUTH_REDIRECT_DELAY_MS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +24,6 @@ import { NotificationService } from '../../shared/notification/notification.serv
     EmailValidateDirective,
     CommonModule,
     LoaderComponent,
-    LazyLoadImageModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -70,7 +69,7 @@ export class LoginComponent {
           //mock delay to visualize loader
           setTimeout(() => {
             this.isLoading.set(false);
-          }, 2000);
+          }, AUTH_REDIRECT_DELAY_MS);
         },
       });
   }

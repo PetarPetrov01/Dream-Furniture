@@ -16,7 +16,7 @@ import { AuthService } from '../../shared/auth.service';
 import { MatchPasswordsDirective } from '../../shared/validators/match-passwords.directive';
 import { EmailValidateDirective } from '../../shared/validators/email-validator.directive';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
+import { AUTH_REDIRECT_DELAY_MS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-register',
@@ -27,7 +27,6 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     EmailValidateDirective,
     CommonModule,
     LoaderComponent,
-    LazyLoadImageModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
@@ -74,7 +73,7 @@ export class RegisterComponent {
           //mock delay to visualize loader
           setTimeout(() => {
             this.isLoading.set(false);
-          }, 2000);
+          }, AUTH_REDIRECT_DELAY_MS);
         },
       });
   }
