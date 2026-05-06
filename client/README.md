@@ -1,6 +1,7 @@
 # DreamFurniture
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.1.0.
+Built with [Angular](https://angular.dev/) v20 (originally scaffolded on v17.1.0). The app uses standalone components, the signals-based reactivity model, lazy-loaded routes (`loadComponent`), and `OnPush` change detection across all components.
+
 The application is deployed at https://dream-furniture-1e92c.web.app
 
 ## Content table
@@ -211,7 +212,7 @@ Authenticated users can create their own wishlist and manage their favorite prod
 
 The cart is the place where the user can see his final presentation of the products he wants to buy with their price (per product, total price of the current product, overall total price). From the cart, he can manage all products (incrementing or decerementing the count of a product and removing the product from the cart). Upon removing the item from the cart, a modal is displayed and the user has to confirm he wants to remove the item from the cart.
 
-The cart utilizes the ngrx store to keep the state of the user's cart. Additionaly the ngrx-store-localstorage is used to keep the the state through the session.
+The cart state is held in `CartStore`, a `providedIn: 'root'` service that exposes a readonly `items` signal and `computed` signals for `totalCount` / `totalPrice`. Mutations go through `addItem` / `decrease` / `remove` / `reset` methods. Persistence between sessions is handled by a small `localStorageSignal` helper (`shared/local-storage-signal.ts`) — a writable signal that hydrates itself from `localStorage` on init and writes back on every change via an `effect()`.
 
 #### Cart view
 
