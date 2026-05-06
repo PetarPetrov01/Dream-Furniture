@@ -1,31 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { signal } from '@angular/core';
 
 import { HeaderComponent } from './header.component';
-import {} from '@angular/common/http';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Store } from '@ngrx/store';
 import { AuthService } from '../../shared/auth.service';
-import { EMPTY } from 'rxjs';
+import { CartStore } from '../../auth/cart/cart.store';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   let authServiceMock: jasmine.SpyObj<AuthService>;
-  let mockStore: jasmine.SpyObj<Store>;
+  let cartStoreMock: jasmine.SpyObj<CartStore>;
 
   beforeEach(async () => {
-    mockStore = jasmine.createSpyObj('Store', ['select']);
-    authServiceMock = jasmine.createSpyObj('AuthService', ['']);
+    authServiceMock = jasmine.createSpyObj(
+      'AuthService',
+      ['clearUserSession'],
+      { isLogged: false }
+    );
+    cartStoreMock = jasmine.createSpyObj('CartStore', ['reset'], {
+      totalCount: signal(0),
+      items: signal([]),
+      totalPrice: signal(0),
+    });
 
     await TestBed.configureTestingModule({
       imports: [HeaderComponent, RouterTestingModule],
       providers: [
-        { provide: Store, useValue: mockStore },
+        { provide: CartStore, useValue: cartStoreMock },
         { provide: AuthService, useValue: authServiceMock },
       ],
     }).compileComponents();
 
-    mockStore.select.and.returnValue(EMPTY);
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -33,5 +39,9 @@ describe('HeaderComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should expose the cart total count signal from CartStore', () => {
+    expect(component.cartQuantity()).toBe(0);
   });
 });

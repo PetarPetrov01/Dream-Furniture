@@ -1,24 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Store } from '@ngrx/store';
 import { ClearDialogComponent } from './clear-dialog.component';
+import { CartStore } from '../cart.store';
 
 describe('ClearDialogComponent', () => {
   let component: ClearDialogComponent;
   let fixture: ComponentFixture<ClearDialogComponent>;
-  let storeMock: jasmine.SpyObj<Store>;
+  let cartStoreMock: jasmine.SpyObj<CartStore>;
 
   beforeEach(async () => {
-    storeMock = jasmine.createSpyObj('Store', ['dispatch']);
+    cartStoreMock = jasmine.createSpyObj('CartStore', ['reset']);
 
     await TestBed.configureTestingModule({
       imports: [ClearDialogComponent],
-      providers: [
-        {
-          provide: Store,
-          useValue: storeMock,
-        },
-      ],
+      providers: [{ provide: CartStore, useValue: cartStoreMock }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ClearDialogComponent);
@@ -30,8 +25,8 @@ describe('ClearDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('Should dispatch store onConfirm',()=>{
-    component.onConfirm()
-    expect(storeMock.dispatch).toHaveBeenCalled();
-  })
+  it('should reset the cart store on confirm', () => {
+    component.onConfirm();
+    expect(cartStoreMock.reset).toHaveBeenCalled();
+  });
 });
