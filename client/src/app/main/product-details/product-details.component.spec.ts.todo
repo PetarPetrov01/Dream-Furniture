@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProductDetailsComponent } from './product-details.component';
-import { HttpClientModule } from '@angular/common/http';
+import {} from '@angular/common/http';
 import { ApiService } from '../../shared/api.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AuthService } from '../../shared/auth.service';

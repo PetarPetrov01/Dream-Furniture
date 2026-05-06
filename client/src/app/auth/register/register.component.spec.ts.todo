@@ -279,22 +279,10 @@ describe('RegisterComponent', () => {
       expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
     });
 
-    it('should unsubscribe from the service', () => {
-      authServiceMock.register.and.returnValue(of(mockUser));
-      ngZone.run(() => component.handleRegister());
-
-      expect(component.subscription).toBeTruthy();
-
-      if (
-        component.subscription &&
-        typeof component.subscription.unsubscribe === 'function'
-      ) {
-        spyOn(component.subscription, 'unsubscribe');
-        component.ngOnDestroy();
-        expect(component.subscription.unsubscribe).toHaveBeenCalled();
-      } else {
-        fail('Subscription or unsubscribe method is not defined.');
-      }
-    });
+    // Removed: 'should unsubscribe from the service'
+    // The component no longer holds a manual Subscription field;
+    // subscription teardown is handled by takeUntilDestroyed().
+    // A replacement test would assert no further emissions land
+    // after the component is destroyed.
   });
 });

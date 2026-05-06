@@ -1,8 +1,17 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 
-import { Subject, Subscription, debounceTime } from 'rxjs';
+import { Subject, debounceTime } from 'rxjs';
 
 import { ApiService } from '../../shared/api.service';
 import { APIProduct } from '../../types/Product';
@@ -22,7 +31,6 @@ interface PriceRange {
 
 @Component({
   selector: 'app-products',
-  standalone: true,
   imports: [
     CommonModule,
     RouterLink,
@@ -35,18 +43,24 @@ interface PriceRange {
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductsComponent implements OnInit, OnDestroy {
-  products: APIProduct[] | [] = [];
-  queryParams: Params = {};
+export class ProductsComponent implements OnInit {
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
+
+  readonly products = signal<APIProduct[]>([]);
+  readonly queryParams = signal<Params>({});
+  readonly isLoading = signal(false);
+  readonly hasQueryParams = computed(
+    () => Object.keys(this.queryParams()).length > 0
+  );
 
   categoryChange$: Subject<string> = new Subject<string>();
   hasDebounced: boolean = false;
 
-  querySubscription: Subscription | null = null;
-  apiSubscription: Subscription | null = null;
-
-  isLoading: boolean = false;
   search: string = '';
   sort: string = '';
   priceRange: PriceRange = {
@@ -55,68 +69,49 @@ export class ProductsComponent implements OnInit, OnDestroy {
   };
 
   sortOptions = [
-    {
-      value: 'name:asc',
-      text: 'Name (A to Z)',
-    },
-    {
-      value: 'name:desc',
-      text: 'Name (Z to A)',
-    },
-    {
-      value: 'price:asc',
-      text: 'Price ascending',
-    },
-    {
-      value: 'price:desc',
-      text: 'Price descending',
-    },
-    {
-      value: 'createdAt:asc',
-      text: 'Oldest first',
-    },
-    {
-      value: 'createdAt desc',
-      text: 'Newest first',
-    },
+    { value: 'name:asc', text: 'Name (A to Z)' },
+    { value: 'name:desc', text: 'Name (Z to A)' },
+    { value: 'price:asc', text: 'Price ascending' },
+    { value: 'price:desc', text: 'Price descending' },
+    { value: 'createdAt:asc', text: 'Oldest first' },
+    { value: 'createdAt desc', text: 'Newest first' },
   ];
 
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
-
   ngOnInit(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
 
-    this.querySubscription = this.route.queryParams.subscribe((params) => {
-      this.queryParams = params;
-      this.sort = this.queryParams['sort'] || '';
-      this.search = this.queryParams['search'] || '';
-
-      this.categoryChange$.pipe(debounceTime(1000)).subscribe((category) => {
+    this.categoryChange$
+      .pipe(debounceTime(1000), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.fetchProducts();
       });
 
-      if (!this.hasDebounced) {
-        this.fetchProducts();
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.queryParams.set(params);
+        this.sort = params['sort'] || '';
+        this.search = params['search'] || '';
+
+        if (!this.hasDebounced) {
+          this.fetchProducts();
+        }
+      });
   }
 
   fetchProducts() {
-    this.isLoading = true;
-    this.apiSubscription = this.apiService
-    .getProducts(this.queryParams)
-    .subscribe((prods) => {
-        this.isLoading = false;
-        this.products = prods;
+    this.isLoading.set(true);
+    this.apiService
+      .getProducts(this.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((prods) => {
+        this.isLoading.set(false);
+        this.products.set(prods);
       });
   }
 
   changeCategory(category: string) {
-    if (category == this.queryParams['category']) {
+    if (category == this.queryParams()['category']) {
       return;
     }
 
@@ -140,7 +135,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     if (this.search) {
       search = this.search;
-    } else if (this.queryParams['search']) {
+    } else if (this.queryParams()['search']) {
       //   If the user has searched and clears the search
       search = null;
     } else {
@@ -165,7 +160,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   onClear() {
-    if (Object.keys(this.queryParams).length < 1) {
+    if (Object.keys(this.queryParams()).length < 1) {
       return;
     }
 
@@ -179,7 +174,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onPriceChange(caller?: string | null) {
     if (this.priceRange.lower > this.priceRange.upper) {
-      console.log(caller);
       if (caller == 'lower') {
         this.priceRange.lower = this.priceRange.upper;
       }
@@ -195,14 +189,5 @@ export class ProductsComponent implements OnInit, OnDestroy {
       },
       queryParamsHandling: 'merge',
     });
-  }
-
-  get hasQueryParams() {
-    return !!Object.keys(this.queryParams).length;
-  }
-
-  ngOnDestroy(): void {
-    this.querySubscription?.unsubscribe();
-    this.apiSubscription?.unsubscribe();
   }
 }

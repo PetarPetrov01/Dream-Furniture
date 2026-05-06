@@ -3,25 +3,25 @@
     <div class="wrapper">
       <div class="image-section">
         <div class="media">
-          <img [src]="product?.image" [alt]="product?.name" />
+          <img [src]="product()?.image" [alt]="product()?.name" />
         </div>
       </div>
       <div class="buy-section">
-        <h1>{{ product?.name }}</h1>
-        <p>{{ product?.category?.join(", ") }}</p>
+        <h1>{{ product()?.name }}</h1>
+        <p>{{ product()?.category?.join(", ") }}</p>
         <div class="price">
           <h1 id="price">
-            ${{ product?.price! | floorPrice }}<span id="decimals">{{product?.price! | decimalSlice}}</span>
+            ${{ product()?.price! | floorPrice }}<span id="decimals">{{product()?.price! | decimalSlice}}</span>
           </h1>
-          <span id="monthly-price">or ~ 12 x ${{ monthlyPrice(product?.price) }}</span>
+          <span id="monthly-price">or ~ 12 x ${{ monthlyPrice(product()?.price) }}</span>
         </div>
         <p class="shipping">
           Free shipping and express delivery across Europe in just 3-5 working
           days.
         </p>
-        <p>Color: {{ product?.color }}</p>
-        <ng-container *ngIf="isUser">
-          <ng-container *ngIf="!isOwner">
+        <p>Color: {{ product()?.color }}</p>
+        @if (isUser) {
+          @if (!isOwner) {
             <div class="quantity">
               <div class="input-group">
                 <p>Quantity:</p>
@@ -30,83 +30,87 @@
                   id="qty"
                   [(ngModel)]="buyQty"
                   (blur)="onInputBlur()"
-                />
+                  />
+                </div>
+                <div class="update-qty">
+                  <a (click)="removeQty()">-</a>
+                  <a (click)="addQty()">+</a>
+                </div>
               </div>
-              <div class="update-qty">
-                <a (click)="removeQty()">-</a>
-                <a (click)="addQty()">+</a>
+              <div class="controls">
+                <a id="button-cart" (click)="addToCart()">Add to cart</a>
+                <a id="button-wishlist" (click)="toggleWishlist()"
+                  ><i
+                    class="fa-heart"
+                    [class.fa-solid]="isInWishList"
+                    [class.fa-regular]="!isInWishList"
+                  ></i
+                ></a>
               </div>
+            }
+            @if (isOwner) {
+              <div class="controls owner">
+                <a [routerLink]="'edit'" id="edit-btn">Edit</a>
+                <a id="del-btn" (click)="onDelete()">Delete</a>
+              </div>
+            }
+          }
+          @if (!isUser) {
+            <div class="controls guest">
+              <a routerLink="/auth/login">Login</a>
+              <a routerLink="/auth/register">Register</a>
             </div>
-            <div class="controls">
-              <a id="button-cart" (click)="addToCart()">Add to cart</a>
-              <a id="button-wishlist" (click)="toggleWishlist()"
-                ><i class="fa-heart" ngClass="{{isInWishList? 'fa-solid':'fa-regular'}}"></i
-              ></a>
+          }
+          <div class="keypoints">
+            <p><i class="fa-solid fa-truck"></i><span>Free delivery</span></p>
+            <p>
+              <i class="fa-solid fa-rotate-left"></i
+                ><span>365 days guaranteed return</span>
+              </p>
+              <p>
+                <i class="fa-solid fa-hand-holding-dollar"></i
+                  ><span>Cash on delivery</span>
+                </p>
+              </div>
+              <p id="post-date">Posted on: {{product()?.createdAt! | dateFormatter}} by {{product()?._ownerId?.username}}</p>
             </div>
-          </ng-container>
-          <ng-container *ngIf="isOwner">
-            <div class="controls owner">
-              <a [routerLink]="'edit'" id="edit-btn">Edit</a>
-              <a id="del-btn" (click)="onDelete('200ms','100ms')">Delete</a>
-            </div>
-          </ng-container>
-        </ng-container>
-        <ng-container *ngIf="!isUser">
-          <div class="controls guest">
-            <a routerLink="/auth/login">Login</a>
-            <a routerLink="/auth/register">Register</a>
-          </div>
-        </ng-container>
-        <div class="keypoints">
-          <p><i class="fa-solid fa-truck"></i><span>Free delivery</span></p>
-          <p>
-            <i class="fa-solid fa-rotate-left"></i
-            ><span>365 days guaranteed return</span>
-          </p>
-          <p>
-            <i class="fa-solid fa-hand-holding-dollar"></i
-            ><span>Cash on delivery</span>
-          </p>
-        </div>
-        <p id="post-date">Posted on: {{product?.createdAt! | dateFormatter}} by {{product?._ownerId?.username}}</p>
-      </div>
 
-      <div class="info-section">
-        <h2 id="info-heading">Dimensions and characteristics</h2>
-        <p id="description">Description: {{ product?.description }}</p>
-        <div class="column">
-          <div class="row">
-            <p class="row-label">Categories:</p>
-            <p>{{ product?.category?.join(", ") }}</p>
-          </div>
-          <div class="row">
-            <p class="row-label">Width:</p>
-            <p>{{ product?.dimensions?.width }} mm</p>
-          </div>
-          <div class="row">
-            <p class="row-label">Height:</p>
-            <p>{{ product?.dimensions?.height }} mm</p>
-          </div>
-          <div class="row">
-            <p class="row-label">Depth:</p>
-            <p>{{ product?.dimensions?.depth }} mm</p>
+            <div class="info-section">
+              <h2 id="info-heading">Dimensions and characteristics</h2>
+              <p id="description">Description: {{ product()?.description }}</p>
+              <div class="column">
+                <div class="row">
+                  <p class="row-label">Categories:</p>
+                  <p>{{ product()?.category?.join(", ") }}</p>
+                </div>
+                <div class="row">
+                  <p class="row-label">Width:</p>
+                  <p>{{ product()?.dimensions?.width }} mm</p>
+                </div>
+                <div class="row">
+                  <p class="row-label">Height:</p>
+                  <p>{{ product()?.dimensions?.height }} mm</p>
+                </div>
+                <div class="row">
+                  <p class="row-label">Depth:</p>
+                  <p>{{ product()?.dimensions?.depth }} mm</p>
+                </div>
+              </div>
+              <div class="column">
+                <div class="row">
+                  <p class="row-label">Material:</p>
+                  <p>{{ product()?.material?.join(', ') }}</p>
+                </div>
+                <div class="row">
+                  <p class="row-label">Style:</p>
+                  <p>{{ product()?.style }}</p>
+                </div>
+                <div class="row">
+                  <p class="row-label">Color:</p>
+                  <p>{{ product()?.color }}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="column">
-          <div class="row">
-            <p class="row-label">Material:</p>
-            <p>{{ product?.material?.join(', ') }}</p>
-          </div>
-          <div class="row">
-            <p class="row-label">Style:</p>
-            <p>{{ product?.style }}</p>
-          </div>
-          <div class="row">
-            <p class="row-label">Color:</p>
-            <p>{{ product?.color }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>

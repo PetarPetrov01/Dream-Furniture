@@ -1,19 +1,21 @@
-<span
-  *ngIf="type == 'spinner'"
-  class="loader"
-  [style.width]="diameter"
-  [style.height]="diameter"
-  [style.border]="width + ' solid'"
-  [style.borderColor]="color"
-  [style.borderBottomColor]="'transparent'"
->
-</span>
+@if (type() == 'spinner') {
+  <span
+    class="loader"
+    [style.width]="diameter()"
+    [style.height]="diameter()"
+    [style.border]="width() + ' solid'"
+    [style.borderColor]="color()"
+    [style.borderBottomColor]="'transparent'"
+    >
+  </span>
+}
 
-<span
-  *ngIf="type == 'dots'"
-  class="loader-dots"
-  [style.width]="diameter"
-  [style.height]="diameter"
->
-</span>
+@if (type() == 'dots') {
+  <span
+    class="loader-dots"
+    [style.width]="diameter()"
+    [style.height]="diameter()"
+    >
+  </span>
+}
 

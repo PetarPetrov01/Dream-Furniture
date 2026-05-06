@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Params } from '@angular/router';
 
@@ -11,7 +11,8 @@ import { User } from '../types/User';
   providedIn: 'root',
 })
 export class ApiService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+
 
   getProducts(params: Params) {
     return this.http.get<APIProduct[]>('/api/products', { params });

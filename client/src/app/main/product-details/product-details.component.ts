@@ -1,71 +1,76 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Subscription, tap } from 'rxjs';
-import { Store } from '@ngrx/store';
-
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
 import { PopulatedProduct } from '../../types/Product';
 
-import { CartComponent } from '../../auth/cart/cart.component';
 import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.component';
 
 import { DateFormatterPipe } from '../../shared/pipes/date-formatter.pipe';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
-import * as CartActions from '../../auth/cart/cart.actions';
+import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
+import { CART_MAX_QTY, DIALOG_DEFAULTS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-product-details',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     RouterLink,
-    DeleteDialogComponent,
     DateFormatterPipe,
     FloorPricePipe,
     DecimalSlicePipe,
   ],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductDetailsComponent implements OnInit, OnDestroy {
-  product: PopulatedProduct | null = null;
+export class ProductDetailsComponent implements OnInit {
+  private activated = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
+  private notificaionService = inject(NotificationService);
+  private matDialog = inject(MatDialog);
+  private router = inject(Router);
+  private cartStore = inject(CartStore);
+  private destroyRef = inject(DestroyRef);
+
+  readonly product = signal<PopulatedProduct | null>(null);
   productId: string = '';
-  subscription: Subscription | null = null;
 
   buyQty: number = 1;
 
-  constructor(
-    private activated: ActivatedRoute,
-    private apiService: ApiService,
-    private authService: AuthService,
-    private notificaionService: NotificationService,
-    private matDialog: MatDialog,
-    private router: Router,
-    private store: Store<CartComponent>
-  ) {}
-
   ngOnInit(): void {
-    this.activated.params.subscribe((params) => {
-      this.productId = params['id'];
-      this.subscription = this.apiService.getProduct(this.productId).subscribe({
-        next: (prod) => {
-          this.product = prod;
-        },
-        error: (err) => {
-          this.router.navigate([`/products/${this.productId}/not-found`]);
-          console.log(err);
-        },
+    this.activated.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.productId = params['id'];
+        this.apiService.getProduct(this.productId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (prod) => {
+              this.product.set(prod);
+            },
+            error: () => {
+              this.router.navigate([`/products/${this.productId}/not-found`]);
+            },
+          });
       });
-    });
   }
 
   get isUser() {
@@ -73,7 +78,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   get isOwner() {
-    return this.product?._ownerId._id == this.authService.user?._id;
+    return this.product()?._ownerId._id == this.authService.user?._id;
   }
 
   get isInWishList() {
@@ -89,7 +94,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   addQty() {
-    if (this.buyQty >= 50) {
+    if (this.buyQty >= CART_MAX_QTY) {
       return;
     }
     this.buyQty += 1;
@@ -103,50 +108,43 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   toggleWishlist() {
-    this.apiService.toggleWishList(this.productId).subscribe((user) => {
-      this.router.navigate([`/products/${this.productId}`]);
-      this.authService.setUserStorage(user);
-      this.authService.setUserSubject(user);
-    });
+    this.apiService.toggleWishList(this.productId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.router.navigate([`/products/${this.productId}`]);
+        this.authService.setUserStorage(user);
+        this.authService.setUserSubject(user);
+      });
   }
 
   addToCart() {
-    if (this.product) {
-      this.store.dispatch(
-        CartActions.addItem({ product: this.product, qty: this.buyQty })
-      );
-      this.notificaionService.setNotification(
-        'Item added to cart successfully!'
-      );
-    } else {
-      return;
-    }
+    const prod = this.product();
+    if (!prod) return;
+    this.cartStore.addItem(prod, this.buyQty);
+    this.notificaionService.setNotification(
+      'Item added to cart successfully!'
+    );
   }
 
   onInputBlur() {
     if (
       !this.buyQty ||
       this.buyQty < 1 ||
-      this.buyQty > 50 ||
+      this.buyQty > CART_MAX_QTY ||
       Number.isInteger(this.buyQty) == false
     ) {
       this.buyQty = 1;
     }
   }
 
-  onDelete(enterAnimationDuration: string, exitAnimationDuration: string) {
+  onDelete() {
+    const prod = this.product();
     this.matDialog.open(DeleteDialogComponent, {
-      width: '300px',
-      enterAnimationDuration,
-      exitAnimationDuration,
+      ...DIALOG_DEFAULTS,
       data: {
-        productName: this.product?.name,
-        _id: this.product?._id,
+        productName: prod?.name,
+        _id: prod?._id,
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 }

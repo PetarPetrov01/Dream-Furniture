@@ -1,6 +1,10 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
-
-import { Subscription } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   MatDialogRef,
@@ -23,31 +27,22 @@ export interface DialogData {
   selector: 'delete-dialog',
   templateUrl: 'delete-dialog.component.html',
   styleUrl: 'delete-dialog.component.css',
-  standalone: true,
   imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DeleteDialogComponent implements OnDestroy {
-  subscription: Subscription | null = null;
-
-  constructor(
-    public dialogRef: MatDialogRef<DeleteDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private apiService: ApiService,
-    private router: Router
-  ) {}
+export class DeleteDialogComponent {
+  dialogRef = inject<MatDialogRef<DeleteDialogComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   onConfirm() {
-    this.subscription = this.apiService
+    this.apiService
       .deleteProduct(this.data._id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-      //subscribe is meaningless as delete request returns nothing
 
-      this.router.navigate(['/products']);
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.router.navigate(['/products']);
   }
 }

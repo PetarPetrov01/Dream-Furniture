@@ -1,37 +1,30 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, Subscription, tap } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 
 import { cookieName } from '../auth/auth.component';
 
 import { APIProduct, PopulatedProduct } from '../types/Product';
 import { User } from '../types/User';
-import { Store } from '@ngrx/store';
 
-import * as CartActions from '../auth/cart/cart.actions';
+import { CartStore } from '../auth/cart/cart.store';
 import { APIOrder, Order } from '../types/Order';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
+export class AuthService {
+  private http = inject(HttpClient);
+  private cookieService = inject(CookieService);
+  private cartStore = inject(CartStore);
+
   private user$$ = new BehaviorSubject<User | undefined>(undefined);
   public user$ = this.user$$.asObservable();
 
-  user: User | undefined;
-
-  subscription: Subscription;
-
-  constructor(
-    private http: HttpClient,
-    private cookieService: CookieService,
-    private store: Store
-  ) {
-    this.subscription = this.user$$.subscribe((user) => {
-      this.user = user;
-    });
+  get user(): User | undefined {
+    return this.user$$.value;
   }
 
   get isLogged(): boolean {
@@ -119,12 +112,8 @@ export class AuthService implements OnDestroy {
     localStorage.removeItem('[user]');
     this.user$$.next(undefined);
     this.cookieService.delete(cookieName, '/');
-    this.store.dispatch(CartActions.resetState());
+    this.cartStore.reset();
 
     this.http.get('/api/auth/logout').subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

@@ -1,27 +1,36 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from './notification.service';
 
 @Component({
   selector: 'app-notification',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './notification.component.html',
   styleUrl: './notification.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationComponent implements OnInit {
-  notification: null | string = null;
+  readonly notification = signal<string | null>(null);
 
   notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.notificationService.notificaiton$.subscribe((notification) => {
-      this.notification = notification;
-    });
+    this.notificationService.notification$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((notification) => {
+        this.notification.set(notification);
+      });
   }
 
-  clearNotification(){
+  clearNotification() {
     this.notificationService.clearNotification();
   }
-
 }

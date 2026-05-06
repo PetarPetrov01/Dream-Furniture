@@ -106,8 +106,6 @@ describe('AddProductComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    paramsSubject.asObservable().subscribe(e=>console.log(e))
-
     component.ngOnInit();
     expect(component.isEditing).toBeFalse();
     expect(apiServiceMock.getProduct).not.toHaveBeenCalled();

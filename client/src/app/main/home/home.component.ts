@@ -1,8 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../shared/api.service';
-import {  Subscription } from 'rxjs';
 import { APIProduct } from '../../types/Product';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { LoaderCardComponent } from '../../shared/loader-card/loader-card.component';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
@@ -10,32 +17,29 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
+  imports: [RouterLink, LoaderCardComponent, FloorPricePipe, DecimalSlicePipe],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements OnInit, OnDestroy{
-products: APIProduct[] | [] = [];
-isLoading: boolean = false;
+export class HomeComponent implements OnInit {
+  private apiService = inject(ApiService);
+  private destroyRef = inject(DestroyRef);
 
-subscription: Subscription | null = null;
-
-constructor (private apiService: ApiService){
-}
+  readonly products = signal<APIProduct[]>([]);
+  readonly isLoading = signal(false);
 
   ngOnInit(): void {
-    this.isLoading = true;
-    
-    this.subscription = this.apiService.getProducts({limit: 3, sort: 'createdAt:asc'}).subscribe(products=>{
-      setTimeout(()=>{
-        this.products = products;
-        this.isLoading = false;
-      },2000)
-    })
-  }
+    this.isLoading.set(true);
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe()
+    this.apiService
+      .getProducts({ limit: 3, sort: 'createdAt:asc' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((products) => {
+        setTimeout(() => {
+          this.products.set(products);
+          this.isLoading.set(false);
+        }, 2000);
+      });
   }
 }

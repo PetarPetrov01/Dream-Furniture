@@ -1,82 +1,87 @@
 <section class="cart">
   <div class="container">
-    <div class="products-wrapper" *ngIf="totalCount">
-      <div class="header">
-        <h2>
-          Cart <span>Products: {{ totalCount }}</span>
-        </h2>
-        <a id="clear-cart-btn" (click)="handleClearCart()">
-          Clear cart <i class="fa-regular fa-circle-xmark"></i>
-        </a>
-      </div>
-      <div class="cards-container">
-        @for (product of products$ | async; track $index) {
-        <div class="card">
-          <div class="media">
-            <img [src]="product.image" alt="{{ product.name }}" />
-          </div>
-          <div class="card-info">
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.category.join(", ") }}</p>
-            <p>Material: {{ product.material.join(", ") }}</p>
-          </div>
-          <div class="controls">
-            <h3>${{ (product.quantity * product.price).toFixed(2) }}</h3>
-            <div class="count-control">
-              <a (click)="handleDecreaseQuantity(product)" class="decrease"
-                ><i class="fa-solid fa-circle-minus"></i
-              ></a>
-              <h3>{{ product.quantity }}</h3>
-              <a (click)="handleIncreaseQuantity(product)" class="increase"
-                ><i class="fa-solid fa-circle-plus"></i
-              ></a>
-            </div>
-            <a class="wishlist" (click)="toggleWishlist(product)"
-              >{{ isInWishList(product) ? "Remove from " : "Add to " }}wishlist
-              <i
-                class="fa-heart"
-                ngClass="{{
-                  isInWishList(product) ? 'fa-solid' : 'fa-regular'
-                }}"
-              ></i
-            ></a>
-            <a class="remove-btn" (click)="handleRemove(product)"
-              >Remove <i class="fa-regular fa-trash-can"></i
-            ></a>
+    @if (totalCount()) {
+      <div class="products-wrapper">
+        <div class="header">
+          <h2>
+            Cart <span>Products: {{ totalCount() }}</span>
+          </h2>
+          <a id="clear-cart-btn" (click)="handleClearCart()">
+            Clear cart <i class="fa-regular fa-circle-xmark"></i>
+          </a>
+        </div>
+        <div class="cards-container">
+          @for (product of products(); track product._id) {
+            <div class="card">
+              <div class="media">
+                <img [src]="product.image" alt="{{ product.name }}" />
+              </div>
+              <div class="card-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.category.join(", ") }}</p>
+                <p>Material: {{ product.material.join(", ") }}</p>
+              </div>
+              <div class="controls">
+                <h3>${{ (product.quantity * product.price).toFixed(2) }}</h3>
+                <div class="count-control">
+                  <a (click)="handleDecreaseQuantity(product)" class="decrease"
+                    ><i class="fa-solid fa-circle-minus"></i
+                  ></a>
+                  <h3>{{ product.quantity }}</h3>
+                  <a (click)="handleIncreaseQuantity(product)" class="increase"
+                    ><i class="fa-solid fa-circle-plus"></i
+                  ></a>
+                </div>
+                <a class="wishlist" (click)="toggleWishlist(product)"
+                  >{{ isInWishList(product) ? "Remove from " : "Add to " }}wishlist
+                  <i
+                    class="fa-heart"
+                    [class.fa-solid]="isInWishList(product)"
+                    [class.fa-regular]="!isInWishList(product)"
+                    ></i
+                  ></a>
+                  <a class="remove-btn" (click)="handleRemove(product)"
+                    >Remove <i class="fa-regular fa-trash-can"></i
+                  ></a>
+                </div>
+              </div>
+            }
           </div>
         </div>
-        }
-      </div>
-    </div>
-    <div class="order" *ngIf="totalCount">
-      <h2>Order info</h2>
-      <div class="final-price">
-        <h4>
-          <p>Products:</p>
-          <p id="products-price">
-            ${{ totalPrice! | floorPrice
-            }}<span>{{ totalPrice! | decimalSlice }}</span>
+      }
+      @if (totalCount()) {
+        <div class="order">
+          <h2>Order info</h2>
+          <div class="final-price">
+            <h4>
+              <p>Products:</p>
+              <p id="products-price">
+                ${{ totalPrice() | floorPrice
+                }}<span>{{ totalPrice() | decimalSlice }}</span>
+              </p>
+            </h4>
+            <h4>Delivery: <span>FREE</span></h4>
+            <h2>
+              Total: ${{ totalPrice() | floorPrice }}
+              <span>{{ totalPrice() | decimalSlice }}</span>
+            </h2>
+          </div>
+          <a (click)="handleCompleteOrder()">Complete order</a>
+        </div>
+      }
+      @if (!totalCount()) {
+        <div class="no-products">
+          <div class="div">
+            <img src="assets/images/empty-cart.png" alt="" />
+            <h2>No items in the cart</h2>
+          </div>
+          <p>
+            Your cart is currently empty! We offer a wide variety of products to
+            suit your needs. Take a look at our featured categories or browse by
+            brand to find the perfect items.
           </p>
-        </h4>
-        <h4>Delivery: <span>FREE</span></h4>
-        <h2>
-          Total: ${{ totalPrice! | floorPrice }}
-          <span>{{ totalPrice! | decimalSlice }}</span>
-        </h2>
-      </div>
-      <a (click)="handleCompleteOrder()">Complete order</a>
+          <a routerLink="/products">Browse products</a>
+        </div>
+      }
     </div>
-    <div class="no-products" *ngIf="!totalCount">
-      <div class="div">
-        <img src="assets/images/empty-cart.png" alt="" />
-        <h2>No items in the cart</h2>
-      </div>
-      <p>
-        Your cart is currently empty! We offer a wide variety of products to
-        suit your needs. Take a look at our featured categories or browse by
-        brand to find the perfect items.
-      </p>
-      <a routerLink="/products">Browse products</a>
-    </div>
-  </div>
-</section>
+  </section>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { HeaderComponent } from './core/header/header.component';
@@ -9,19 +9,18 @@ import { NotificationComponent } from './shared/notification/notification.compon
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [
     RouterOutlet,
     HeaderComponent,
     FooterComponent,
     AuthComponent,
     ErrorComponent,
-    NotificationComponent
+    NotificationComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   title = 'dreamFurniture';
-  constructor() {}
 }

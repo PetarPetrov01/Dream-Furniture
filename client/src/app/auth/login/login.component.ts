@@ -1,43 +1,43 @@
-import { Component, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
-
 import { AuthService } from '../../shared/auth.service';
 import { EmailValidateDirective } from '../../shared/validators/email-validator.directive';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { NotificationService } from '../../shared/notification/notification.service';
+import { AUTH_REDIRECT_DELAY_MS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [
     RouterLink,
     ReactiveFormsModule,
     EmailValidateDirective,
     CommonModule,
     LoaderComponent,
-    LazyLoadImageModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnDestroy {
-  subscription: Subscription | null;
-  isLoading: boolean = false;
-  showPass: boolean = false;
+export class LoginComponent {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
+  private destroyRef = inject(DestroyRef);
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService,
-    private notificationService: NotificationService
-  ) {
-    this.subscription = null;
-  }
+  readonly isLoading = signal(false);
+  readonly showPass = signal(false);
 
   loginForm = this.fb.group({
     email: ['', [Validators.required]],
@@ -48,34 +48,33 @@ export class LoginComponent implements OnDestroy {
     if (this.loginForm.invalid) {
       return;
     }
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     const { email, password } = this.loginForm.value;
 
     this.loginForm.reset();
 
-    this.authService.login(email!, password!).subscribe({
-      next: (user) => {
-        this.router.navigate(['/']);
-        this.isLoading = false;
-        this.notificationService.setNotification(
-          `Successfully logged in as ${user.username}`
-        );
-      },
-      error: () => {
-        //mock delay to visualize loader
-        setTimeout(() => {
-          this.isLoading = false;
-        }, 2000);
-      },
-    });
+    this.authService
+      .login(email!, password!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.router.navigate(['/']);
+          this.isLoading.set(false);
+          this.notificationService.setNotification(
+            `Successfully logged in as ${user.username}`
+          );
+        },
+        error: () => {
+          //mock delay to visualize loader
+          setTimeout(() => {
+            this.isLoading.set(false);
+          }, AUTH_REDIRECT_DELAY_MS);
+        },
+      });
   }
 
-  toggleShowPass(){
-    this.showPass = !this.showPass;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  toggleShowPass() {
+    this.showPass.update((v) => !v);
   }
 }

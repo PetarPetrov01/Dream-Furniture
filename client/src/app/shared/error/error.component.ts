@@ -1,23 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ErrorService } from './error.service';
-import { Observable } from 'rxjs';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-error',
-  standalone: true,
-  imports: [NgIf],
+  imports: [],
   templateUrl: './error.component.html',
-  styleUrl: './error.component.css'
+  styleUrl: './error.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ErrorComponent implements OnInit{
-  error: string | null = null;
+export class ErrorComponent implements OnInit {
+  private errorService = inject(ErrorService);
+  private destroyRef = inject(DestroyRef);
 
-  constructor(private errorService: ErrorService){}
+  readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.errorService.error$.subscribe((err)=>{
-      this.error = err
-    })
+    this.errorService.error$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((err) => {
+        this.error.set(err);
+      });
   }
 }

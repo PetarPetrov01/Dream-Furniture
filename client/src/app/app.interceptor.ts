@@ -1,14 +1,8 @@
-import { Injectable, Provider } from '@angular/core';
-import {
-  HTTP_INTERCEPTORS,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from '@angular/common/http';
+import { Injectable, Provider, inject } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 
 import { AuthService } from './shared/auth.service';
 import { environment } from '../environments/environment';
@@ -18,11 +12,10 @@ const { appUrl } = environment;
 
 @Injectable()
 export class AppInterceptor implements HttpInterceptor {
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private errorService: ErrorService
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private errorService = inject(ErrorService);
+
 
   intercept(
     req: HttpRequest<any>,
@@ -38,15 +31,12 @@ export class AppInterceptor implements HttpInterceptor {
         if (err.status === 401) {
           this.authService.clearUserSession();
           this.router.navigate(['/auth/login']);
-        } else {
-          console.error(err);
-          if(req.url.match(/.*\/products\/.+/g)){
-            throw [err];
-          }
-          this.errorService.setError(err.error.message);
-          throw [err];
+          return throwError(() => err);
         }
-        return [err];
+        if (!req.url.match(/\/products\/.+/)) {
+          this.errorService.setError(err.error?.message ?? 'Unknown error');
+        }
+        return throwError(() => err);
       })
     );
   }

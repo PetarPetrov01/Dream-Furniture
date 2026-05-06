@@ -1,17 +1,15 @@
-import { NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-loader',
-  standalone: true,
-  imports: [NgIf],
+  imports: [],
   templateUrl: './loader.component.html',
   styleUrl: './loader.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoaderComponent {
-  @Input()color: string = '#fff'
-  @Input()diameter: string = '48px'
-  @Input()width: string = '5px'
-  @Input()type: ('spinner' | 'dots') = 'spinner';
+  readonly color = input<string>('#fff');
+  readonly diameter = input<string>('48px');
+  readonly width = input<string>('5px');
+  readonly type = input<('spinner' | 'dots')>('spinner');
 }

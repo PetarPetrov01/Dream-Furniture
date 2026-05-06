@@ -1,4 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -13,14 +20,12 @@ import {
 import { AuthService } from '../../../shared/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CommonModule } from '@angular/common';
+
 import { EmailValidateDirective } from '../../../shared/validators/email-validator.directive';
 
 @Component({
   selector: 'app-edit-profile',
-  standalone: true,
   imports: [
-    CommonModule,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
@@ -32,9 +37,12 @@ import { EmailValidateDirective } from '../../../shared/validators/email-validat
   ],
   templateUrl: './edit-profile.component.html',
   styleUrl: './edit-profile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditProfileComponent implements OnInit {
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   editForm = this.fb.group({
     username: ['', Validators.required],
@@ -42,12 +50,14 @@ export class EditProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.authService.user$.subscribe((user) => {
-      this.editForm.patchValue({
-        username: user?.username,
-        email: user?.email,
+    this.authService.user$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.editForm.patchValue({
+          username: user?.username,
+          email: user?.email,
+        });
       });
-    });
   }
 
   onConfirm() {

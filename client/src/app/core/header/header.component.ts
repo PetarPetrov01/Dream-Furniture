@@ -1,39 +1,27 @@
-import { Component } from '@angular/core';
-import { NgIf, Location } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-
-import { Store } from '@ngrx/store';
 
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 
 import { AuthService } from '../../shared/auth.service';
-
-import { CartState } from '../../types/State';
+import { CartStore } from '../../auth/cart/cart.store';
 
 @Component({
   selector: 'app-header',
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgIf, MatMenuModule, MatBadgeModule],
+  imports: [RouterLink, RouterLinkActive, MatMenuModule, MatBadgeModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  cartQuantity: number = 0;
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private cartStore = inject(CartStore);
+  location = inject(Location);
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private store: Store<CartState>,
-    public location: Location
-  ) {
-    this.store.select('cart').subscribe((prods) => {
-      this.cartQuantity = prods.reduce(
-        (acc, prod) => (acc += prod.quantity),
-        0
-      );
-    });
-  }
+  readonly cartQuantity = this.cartStore.totalCount;
 
   get isLogged() {
     return this.authService.isLogged;

@@ -1,19 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../shared/auth.service';
 
 import { MatchPasswordsDirective } from '../../shared/validators/match-passwords.directive';
 import { EmailValidateDirective } from '../../shared/validators/email-validator.directive';
 import { LoaderComponent } from '../../shared/loader/loader.component';
-import { LazyLoadImageModule } from 'ng-lazyload-image';
+import { AUTH_REDIRECT_DELAY_MS } from '../../shared/ui-constants';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
   imports: [
     RouterLink,
     FormsModule,
@@ -21,61 +27,58 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     EmailValidateDirective,
     CommonModule,
     LoaderComponent,
-    LazyLoadImageModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterComponent implements OnDestroy {
-  @ViewChild('registerForm') registerForm: NgForm | undefined;
-  subscription: Subscription | null;
+export class RegisterComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  isLoading: boolean = false;
-  showPass: boolean = false;
+  readonly registerForm = viewChild<NgForm>('registerForm');
 
-  constructor(private authService: AuthService, private router: Router) {
-    this.subscription = null;
-  }
+  readonly isLoading = signal(false);
+  readonly showPass = signal(false);
 
   handleRegister() {
-    if (this.registerForm == undefined || this.registerForm.invalid) {
+    const registerForm = this.registerForm();
+    if (registerForm == undefined || registerForm.invalid) {
       return;
     }
     const {
       email,
       username,
       passwords: { password },
-    } = this.registerForm.value;
+    } = registerForm.value;
 
-    this.registerForm.controls['passwords'].setValue({
+    registerForm.controls['passwords'].setValue({
       password: '',
       rePassword: '',
     });
-    this.registerForm.controls['passwords'].markAsUntouched();
+    registerForm.controls['passwords'].markAsUntouched();
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
-    this.subscription = this.authService
+    this.authService
       .register(email, username, password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.router.navigate(['/']);
-          this.isLoading = false;
+          this.isLoading.set(false);
         },
-        error: (err) => {
+        error: () => {
           //mock delay to visualize loader
           setTimeout(() => {
-            this.isLoading = false;
-          }, 2000);
+            this.isLoading.set(false);
+          }, AUTH_REDIRECT_DELAY_MS);
         },
       });
   }
 
   toggleShowPass() {
-    this.showPass = !this.showPass;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.showPass.update((v) => !v);
   }
 }

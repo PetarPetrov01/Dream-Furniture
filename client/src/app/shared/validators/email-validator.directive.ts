@@ -18,12 +18,11 @@ import {
   ],
 })
 export class EmailValidateDirective implements Validator {
-  pattern: RegExp = /[a-zA-Z0-9]{5,}@[a-zA-Z]+\.[a-zA-Z]{2,}$/g;
-  constructor() {}
+  pattern: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   validate(control: AbstractControl<any, any>): ValidationErrors | null {
     const value = control.value;
-    if (value == '' || value?.match(this.pattern)) {
+    if (value == '' || (value && this.pattern.test(value))) {
       return null;
     }
 

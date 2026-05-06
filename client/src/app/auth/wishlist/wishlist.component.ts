@@ -1,9 +1,15 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
-import { Subscription } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { switchMap } from 'rxjs';
 
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
@@ -12,55 +18,55 @@ import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 import { PopulatedProduct } from '../../types/Product';
-import { CartState } from '../../types/State';
-
-import * as CartActions from '../cart/cart.actions';
+import { CartStore } from '../cart/cart.store';
 
 @Component({
   selector: 'app-wishlist',
-  standalone: true,
-  imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
+  imports: [RouterLink, FloorPricePipe, DecimalSlicePipe],
   templateUrl: './wishlist.component.html',
   styleUrl: './wishlist.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WishlistComponent implements OnInit, OnDestroy {
+export class WishlistComponent implements OnInit {
   authService = inject(AuthService);
   apiService = inject(ApiService);
-  store = inject(Store<CartState>);
+  private cartStore = inject(CartStore);
 
   router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  subscription: Subscription | null = null;
-  wishlist: PopulatedProduct[] | [] = [];
+  readonly wishlist = signal<PopulatedProduct[]>([]);
 
   ngOnInit(): void {
-    this.subscription = this.fetchWishList();
+    this.fetchWishList();
   }
 
   fetchWishList() {
-    return this.authService.getWishlist().subscribe((wishlist) => {
-      this.wishlist = wishlist;
-    });
+    this.authService
+      .getWishlist()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((wishlist) => {
+        this.wishlist.set(wishlist);
+      });
   }
 
   onRemove(prodId: string) {
-    this.apiService.toggleWishList(prodId).subscribe((user) => {
-      //sync user
-      this.authService.setUserStorage(user);
-      this.authService.setUserSubject(user);
-
-      //sync list
-      this.subscription = this.fetchWishList();
-    });
+    this.apiService
+      .toggleWishList(prodId)
+      .pipe(
+        switchMap((user) => {
+          this.authService.setUserStorage(user);
+          this.authService.setUserSubject(user);
+          return this.authService.getWishlist();
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((wishlist) => {
+        this.wishlist.set(wishlist);
+      });
   }
 
   onAddToCart(product: PopulatedProduct) {
-    this.store.dispatch(CartActions.addItem({ product, qty: 1 }));
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.cartStore.addItem(product, 1);
   }
 }

@@ -2,40 +2,42 @@
   <div class="container">
     <div class="wrapper">
       <div class="header">
-        <h2>Wishlist <span>{{wishlist.length}} product{{wishlist.length!=1? 's' : ''}}</span></h2>
+        <h2>Wishlist <span>{{wishlist().length}} product{{wishlist().length!=1? 's' : ''}}</span></h2>
       </div>
       <div class="products-wrapper">
 
-        <div class="no-products" *ngIf="wishlist.length < 1">
+        @if (wishlist().length < 1) {
+          <div class="no-products">
             <h2>
-                No products in the wishlist
+              No products in the wishlist
             </h2>
             <p>Your wishlist is empty. Let's change that! Browse our products and add your favorites.</p>
             <a routerLink="/products">Products</a>
-        </div>
+          </div>
+        }
 
-        @for (product of wishlist; track $index) {
-        <div class="card">
-          <div class="media">
-            <a [routerLink]="'/products/' + product._id">
-              <img [src]="product.image" [alt]="product.name" />
-            </a>
-          </div>
-          <div class="content">
-            <div class="info">
-              <h1>{{ product.name }}</h1>
-              <p>{{ product.category.join(", ") }}</p>
-              <p>{{ product.material.join(", ") }}</p>
+        @for (product of wishlist(); track product._id) {
+          <div class="card">
+            <div class="media">
+              <a [routerLink]="'/products/' + product._id">
+                <img [src]="product.image" [alt]="product.name" />
+              </a>
             </div>
-            <div class="pad">
-              <h2>${{ product.price | floorPrice }} <span>{{product.price | decimalSlice}}</span></h2>
-              <a id="cart-btn" (click)="onAddToCart(product)">Add to cart</a>
-              <a id="remove-btn" (click)="onRemove(product._id)"
-                >Remove <i class="fa-regular fa-trash-can"></i
-              ></a>
+            <div class="content">
+              <div class="info">
+                <h1>{{ product.name }}</h1>
+                <p>{{ product.category.join(", ") }}</p>
+                <p>{{ product.material.join(", ") }}</p>
+              </div>
+              <div class="pad">
+                <h2>${{ product.price | floorPrice }} <span>{{product.price | decimalSlice}}</span></h2>
+                <a id="cart-btn" (click)="onAddToCart(product)">Add to cart</a>
+                <a id="remove-btn" (click)="onRemove(product._id)"
+                  >Remove <i class="fa-regular fa-trash-can"></i
+                ></a>
+              </div>
             </div>
           </div>
-        </div>
         }
       </div>
     </div>

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpInterceptor } from '@angular/common/http';
+import { HttpInterceptor, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppInterceptor } from './app.interceptor';
 import { AuthService } from './shared/auth.service';
 import { Router } from '@angular/router';
 import { ErrorService } from './shared/error/error.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('appInterceptor', () => {
   let interceptor: HttpInterceptor;
@@ -15,23 +15,25 @@ describe('appInterceptor', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
+    imports: [],
+    providers: [
         AppInterceptor,
         {
-          provide: AuthService,
-          useValue: jasmine.createSpyObj('AuthService', ['clearUserSession']),
+            provide: AuthService,
+            useValue: jasmine.createSpyObj('AuthService', ['clearUserSession']),
         },
         {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate']),
+            provide: Router,
+            useValue: jasmine.createSpyObj('Router', ['navigate']),
         },
         {
-          provide: ErrorService,
-          useValue: jasmine.createSpyObj('ErrorService', ['SetError']),
+            provide: ErrorService,
+            useValue: jasmine.createSpyObj('ErrorService', ['SetError']),
         },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
 
     interceptor = TestBed.inject(AppInterceptor);
     authServiceMock = TestBed.inject(

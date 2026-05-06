@@ -1,4 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
@@ -12,7 +20,6 @@ import { APIOrder } from '../../types/Order';
 
 @Component({
   selector: 'app-orders',
-  standalone: true,
   imports: [
     CommonModule,
     DateFormatterPipe,
@@ -22,26 +29,34 @@ import { APIOrder } from '../../types/Order';
   ],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersComponent implements OnInit {
-  orders: APIOrder[] | [] = [];
+  readonly orders = signal<APIOrder[]>([]);
 
   authService = inject(AuthService);
   router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.fetchOrders();
   }
 
   fetchOrders() {
-    this.authService.getOrders().subscribe((orders) => {
-      this.orders = orders;
-    });
+    this.authService
+      .getOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((orders) => {
+        this.orders.set(orders);
+      });
   }
 
   handleDelete(orderId: string) {
-    this.authService.deleteOrder(orderId).subscribe((res) => {
-      this.fetchOrders();
-    });
+    this.authService
+      .deleteOrder(orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.fetchOrders();
+      });
   }
 }
