@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -11,16 +11,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { CartStore } from '../cart.store';
 
 @Component({
-    selector: 'app-clear-dialog',
-    templateUrl: 'clear-dialog.component.html',
-    styleUrl: 'clear-dialog.component.css',
-    imports: [
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-    ]
+  selector: 'app-clear-dialog',
+  templateUrl: 'clear-dialog.component.html',
+  styleUrl: 'clear-dialog.component.css',
+  imports: [
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClearDialogComponent {
   private cartStore = inject(CartStore);

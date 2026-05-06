@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,46 +19,48 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 @Component({
-    selector: 'app-register',
-    imports: [
-        RouterLink,
-        FormsModule,
-        MatchPasswordsDirective,
-        EmailValidateDirective,
-        CommonModule,
-        LoaderComponent,
-        LazyLoadImageModule,
-    ],
-    templateUrl: './register.component.html',
-    styleUrl: './register.component.css'
+  selector: 'app-register',
+  imports: [
+    RouterLink,
+    FormsModule,
+    MatchPasswordsDirective,
+    EmailValidateDirective,
+    CommonModule,
+    LoaderComponent,
+    LazyLoadImageModule,
+  ],
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  @ViewChild('registerForm') registerForm: NgForm | undefined;
+  readonly registerForm = viewChild<NgForm>('registerForm');
 
-  isLoading: boolean = false;
-  showPass: boolean = false;
+  readonly isLoading = signal(false);
+  readonly showPass = signal(false);
 
   handleRegister() {
-    if (this.registerForm == undefined || this.registerForm.invalid) {
+    const registerForm = this.registerForm();
+    if (registerForm == undefined || registerForm.invalid) {
       return;
     }
     const {
       email,
       username,
       passwords: { password },
-    } = this.registerForm.value;
+    } = registerForm.value;
 
-    this.registerForm.controls['passwords'].setValue({
+    registerForm.controls['passwords'].setValue({
       password: '',
       rePassword: '',
     });
-    this.registerForm.controls['passwords'].markAsUntouched();
+    registerForm.controls['passwords'].markAsUntouched();
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     this.authService
       .register(email, username, password)
@@ -59,18 +68,18 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.router.navigate(['/']);
-          this.isLoading = false;
+          this.isLoading.set(false);
         },
         error: () => {
           //mock delay to visualize loader
           setTimeout(() => {
-            this.isLoading = false;
+            this.isLoading.set(false);
           }, 2000);
         },
       });
   }
 
   toggleShowPass() {
-    this.showPass = !this.showPass;
+    this.showPass.update((v) => !v);
   }
 }

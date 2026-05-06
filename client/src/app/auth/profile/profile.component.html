@@ -1,26 +1,26 @@
 <section class="profile">
   <div class="container">
     <aside class="aside-info">
-      <h2>{{ user?.username }}</h2>
-      <p>Email: {{ user?.email }}</p>
+      <h2>{{ user()?.username }}</h2>
+      <p>Email: {{ user()?.email }}</p>
       <a [routerLink]="'wishlist'">Wishlist</a>
       <a (click)="onEditProfile()">Edit profile</a>
       <a (click)="handleLogout()">Logout</a>
     </aside>
     <div class="products">
       <div class="products-header">
-        <h1>Posted products <span>total: {{products.length}}</span></h1>
+        <h1>Posted products <span>total: {{ products().length }}</span></h1>
       </div>
-      @if (products?.length == 0) {
+      @if (products().length == 0) {
         <div class="no-products">
           <h2>No products</h2>
           <p>You still haven't posted any products!</p>
           <a routerLink="/add-product">Post a product</a>
         </div>
       }
-      @if (products?.length != 0 || !products) {
+      @if (products().length > 0) {
         <div class="wrapper">
-          @for (product of products; track product) {
+          @for (product of products(); track product._id) {
             <div class="card">
               <div class="media" [routerLink]="'/products/' + product._id">
                 <img [src]="product.image" [alt]="product.name" />

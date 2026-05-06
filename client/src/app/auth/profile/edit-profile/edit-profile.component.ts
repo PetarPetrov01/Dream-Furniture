@@ -1,4 +1,10 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   MatDialogActions,
@@ -18,8 +24,8 @@ import { MatInputModule } from '@angular/material/input';
 import { EmailValidateDirective } from '../../../shared/validators/email-validator.directive';
 
 @Component({
-    selector: 'app-edit-profile',
-    imports: [
+  selector: 'app-edit-profile',
+  imports: [
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
@@ -27,10 +33,11 @@ import { EmailValidateDirective } from '../../../shared/validators/email-validat
     MatFormFieldModule,
     FormsModule,
     MatInputModule,
-    EmailValidateDirective
-],
-    templateUrl: './edit-profile.component.html',
-    styleUrl: './edit-profile.component.css'
+    EmailValidateDirective,
+  ],
+  templateUrl: './edit-profile.component.html',
+  styleUrl: './edit-profile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditProfileComponent implements OnInit {
   private fb = inject(FormBuilder);

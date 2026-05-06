@@ -1,4 +1,9 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
@@ -19,10 +24,11 @@ export interface DialogData {
 }
 
 @Component({
-    selector: 'delete-dialog',
-    templateUrl: 'delete-dialog.component.html',
-    styleUrl: 'delete-dialog.component.css',
-    imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent]
+  selector: 'delete-dialog',
+  templateUrl: 'delete-dialog.component.html',
+  styleUrl: 'delete-dialog.component.css',
+  imports: [MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeleteDialogComponent {
   dialogRef = inject<MatDialogRef<DeleteDialogComponent>>(MatDialogRef);

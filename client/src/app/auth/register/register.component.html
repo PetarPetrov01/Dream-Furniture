@@ -70,7 +70,7 @@
                 <div class="input-group password">
                   <label for="">Password</label>
                   <input
-                    [type]="showPass ? 'text' : 'password'"
+                    [type]="showPass() ? 'text' : 'password'"
                     placeholder="Type your password"
                     name="password"
                     ngModel
@@ -97,7 +97,7 @@
                   <div class="input-group password">
                     <label for="">Repeat password</label>
                     <input
-                      [type]="showPass ? 'text' : 'password'"
+                      [type]="showPass() ? 'text' : 'password'"
                       placeholder="Type your password again"
                       name="rePassword"
                       ngModel
@@ -108,7 +108,8 @@
                       <div class="show-pass" (click)="toggleShowPass()">
                         <i
                           class="fa-solid"
-                          [ngClass]="showPass ? 'fa-eye' : 'fa-eye-slash'"
+                          [class.fa-eye]="showPass()"
+                          [class.fa-eye-slash]="!showPass()"
                         ></i>
                       </div>
                       <div class="errors">
@@ -127,10 +128,10 @@
                     class="register-btn"
                     [disabled]="registerForm.invalid ? true : false"
                     >
-                    @if (!isLoading) {
+                    @if (!isLoading()) {
                       <p>Register</p>
                     }
-                    @if (isLoading) {
+                    @if (isLoading()) {
                       <app-loader
                         type="dots"
                         diameter="14px"

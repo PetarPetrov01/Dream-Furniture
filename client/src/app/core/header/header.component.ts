@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -9,10 +9,11 @@ import { AuthService } from '../../shared/auth.service';
 import { CartStore } from '../../auth/cart/cart.store';
 
 @Component({
-    selector: 'app-header',
-    imports: [RouterLink, RouterLinkActive, MatMenuModule, MatBadgeModule],
-    templateUrl: './header.component.html',
-    styleUrl: './header.component.css'
+  selector: 'app-header',
+  imports: [RouterLink, RouterLinkActive, MatMenuModule, MatBadgeModule],
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
   private router = inject(Router);

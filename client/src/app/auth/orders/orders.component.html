@@ -2,15 +2,15 @@
   <div class="container">
     <div class="wrapper">
       <div class="header">
-        <h2>Orders <span>count: {{orders.length}}</span></h2>
+        <h2>Orders <span>count: {{orders().length}}</span></h2>
       </div>
 
-      @if (orders.length > 0) {
+      @if (orders().length > 0) {
         <div class="filler"></div>
       }
 
       <div class="orders-wrapper">
-        @if (orders.length < 1) {
+        @if (orders().length < 1) {
           <div class="no-products">
             <h2>No orders yet</h2>
             <p>You don't have any pending orders. Browse our products to order</p>
@@ -18,8 +18,8 @@
           </div>
         }
 
-        @if (orders.length > 0) {
-          @for (order of orders; track order) {
+        @if (orders().length > 0) {
+          @for (order of orders(); track order._id) {
             <div class="order-card">
               <div class="order-heading">
                 <h3><span>№ {{order._id.slice(-8)}}</span> - Processing</h3>

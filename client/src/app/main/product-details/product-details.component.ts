@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -19,17 +26,18 @@ import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
-    selector: 'app-product-details',
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterLink,
-        DateFormatterPipe,
-        FloorPricePipe,
-        DecimalSlicePipe,
-    ],
-    templateUrl: './product-details.component.html',
-    styleUrl: './product-details.component.css'
+  selector: 'app-product-details',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    DateFormatterPipe,
+    FloorPricePipe,
+    DecimalSlicePipe,
+  ],
+  templateUrl: './product-details.component.html',
+  styleUrl: './product-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductDetailsComponent implements OnInit {
   private activated = inject(ActivatedRoute);
@@ -41,7 +49,7 @@ export class ProductDetailsComponent implements OnInit {
   private cartStore = inject(CartStore);
   private destroyRef = inject(DestroyRef);
 
-  product: PopulatedProduct | null = null;
+  readonly product = signal<PopulatedProduct | null>(null);
   productId: string = '';
 
   buyQty: number = 1;
@@ -55,7 +63,7 @@ export class ProductDetailsComponent implements OnInit {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (prod) => {
-              this.product = prod;
+              this.product.set(prod);
             },
             error: () => {
               this.router.navigate([`/products/${this.productId}/not-found`]);
@@ -69,7 +77,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   get isOwner() {
-    return this.product?._ownerId._id == this.authService.user?._id;
+    return this.product()?._ownerId._id == this.authService.user?._id;
   }
 
   get isInWishList() {
@@ -109,8 +117,9 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addToCart() {
-    if (!this.product) return;
-    this.cartStore.addItem(this.product, this.buyQty);
+    const prod = this.product();
+    if (!prod) return;
+    this.cartStore.addItem(prod, this.buyQty);
     this.notificaionService.setNotification(
       'Item added to cart successfully!'
     );
@@ -128,13 +137,14 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   onDelete(enterAnimationDuration: string, exitAnimationDuration: string) {
+    const prod = this.product();
     this.matDialog.open(DeleteDialogComponent, {
       width: '300px',
       enterAnimationDuration,
       exitAnimationDuration,
       data: {
-        productName: this.product?.name,
-        _id: this.product?._id,
+        productName: prod?.name,
+        _id: prod?._id,
       },
     });
   }

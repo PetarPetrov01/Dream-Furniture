@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { HeaderComponent } from './core/header/header.component';
@@ -8,19 +8,19 @@ import { ErrorComponent } from './shared/error/error.component';
 import { NotificationComponent } from './shared/notification/notification.component';
 
 @Component({
-    selector: 'app-root',
-    imports: [
-        RouterOutlet,
-        HeaderComponent,
-        FooterComponent,
-        AuthComponent,
-        ErrorComponent,
-        NotificationComponent
-    ],
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.css'
+  selector: 'app-root',
+  imports: [
+    RouterOutlet,
+    HeaderComponent,
+    FooterComponent,
+    AuthComponent,
+    ErrorComponent,
+    NotificationComponent,
+  ],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   title = 'dreamFurniture';
-  constructor() {}
 }

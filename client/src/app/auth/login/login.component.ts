@@ -1,4 +1,10 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -11,17 +17,18 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
-    selector: 'app-login',
-    imports: [
-        RouterLink,
-        ReactiveFormsModule,
-        EmailValidateDirective,
-        CommonModule,
-        LoaderComponent,
-        LazyLoadImageModule,
-    ],
-    templateUrl: './login.component.html',
-    styleUrl: './login.component.css'
+  selector: 'app-login',
+  imports: [
+    RouterLink,
+    ReactiveFormsModule,
+    EmailValidateDirective,
+    CommonModule,
+    LoaderComponent,
+    LazyLoadImageModule,
+  ],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -30,8 +37,8 @@ export class LoginComponent {
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
 
-  isLoading: boolean = false;
-  showPass: boolean = false;
+  readonly isLoading = signal(false);
+  readonly showPass = signal(false);
 
   loginForm = this.fb.group({
     email: ['', [Validators.required]],
@@ -42,7 +49,7 @@ export class LoginComponent {
     if (this.loginForm.invalid) {
       return;
     }
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     const { email, password } = this.loginForm.value;
 
@@ -54,7 +61,7 @@ export class LoginComponent {
       .subscribe({
         next: (user) => {
           this.router.navigate(['/']);
-          this.isLoading = false;
+          this.isLoading.set(false);
           this.notificationService.setNotification(
             `Successfully logged in as ${user.username}`
           );
@@ -62,13 +69,13 @@ export class LoginComponent {
         error: () => {
           //mock delay to visualize loader
           setTimeout(() => {
-            this.isLoading = false;
+            this.isLoading.set(false);
           }, 2000);
         },
       });
   }
 
   toggleShowPass() {
-    this.showPass = !this.showPass;
+    this.showPass.update((v) => !v);
   }
 }

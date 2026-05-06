@@ -1,9 +1,9 @@
-@if (notification) {
+@if (notification()) {
   <div class="notification-container">
     <div class="notification">
       <i class="fa-solid fa-bell" id="bell-icon"></i>
       <div class="info">
-        <p>{{notification}}</p>
+        <p>{{ notification() }}</p>
       </div>
       <div class="close" (click)="clearNotification()">
         <i class="fa-solid fa-xmark"></i>

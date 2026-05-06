@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,17 +27,18 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 
 @Component({
-    selector: 'app-add-product',
-    imports: [
+  selector: 'app-add-product',
+  imports: [
     MatSelectModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     LazyLoadImageModule,
-    LoaderComponent
-],
-    templateUrl: './add-product.component.html',
-    styleUrl: './add-product.component.css'
+    LoaderComponent,
+  ],
+  templateUrl: './add-product.component.html',
+  styleUrl: './add-product.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddProductComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -40,8 +48,8 @@ export class AddProductComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   editProductId: string | null = null;
-  isEditing: boolean = false;
-  isLoading: boolean = false;
+  readonly isEditing = signal(false);
+  readonly isLoading = signal(false);
   
   categoryList = [
     'Living room',
@@ -74,7 +82,7 @@ export class AddProductComponent implements OnInit {
         const editedProductId = params['id'] || null;
         if (editedProductId) {
           this.editProductId = editedProductId;
-          this.isEditing = true;
+          this.isEditing.set(true);
 
           this.apiService
             .getProduct(editedProductId)
@@ -119,7 +127,7 @@ export class AddProductComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     const { width, height, depth, ...values } = this.addProductForm.value;
     const dimensions = {
       width: Number(width),
@@ -143,12 +151,12 @@ export class AddProductComponent implements OnInit {
       dimensions,
     };
     
-    if (this.isEditing && this.editProductId) {
+    if (this.isEditing() && this.editProductId) {
       this.apiService
         .updateProduct(this.editProductId, data)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
-          this.isLoading = false;
+          this.isLoading.set(false);
           this.router.navigate([`/products/${this.editProductId}`]);
         });
     } else {
@@ -156,7 +164,7 @@ export class AddProductComponent implements OnInit {
         .addProduct(data)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
-          this.isLoading = false;
+          this.isLoading.set(false);
           this.router.navigate(['/products']);
         });
     }

@@ -1,4 +1,12 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
@@ -22,19 +30,20 @@ interface PriceRange {
 }
 
 @Component({
-    selector: 'app-products',
-    imports: [
-        CommonModule,
-        RouterLink,
-        LoaderCardComponent,
-        MatChipsModule,
-        MatSliderModule,
-        FormsModule,
-        FloorPricePipe,
-        DecimalSlicePipe,
-    ],
-    templateUrl: './products.component.html',
-    styleUrl: './products.component.css'
+  selector: 'app-products',
+  imports: [
+    CommonModule,
+    RouterLink,
+    LoaderCardComponent,
+    MatChipsModule,
+    MatSliderModule,
+    FormsModule,
+    FloorPricePipe,
+    DecimalSlicePipe,
+  ],
+  templateUrl: './products.component.html',
+  styleUrl: './products.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsComponent implements OnInit {
   private apiService = inject(ApiService);
@@ -42,13 +51,16 @@ export class ProductsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
-  products: APIProduct[] | [] = [];
-  queryParams: Params = {};
+  readonly products = signal<APIProduct[]>([]);
+  readonly queryParams = signal<Params>({});
+  readonly isLoading = signal(false);
+  readonly hasQueryParams = computed(
+    () => Object.keys(this.queryParams()).length > 0
+  );
 
   categoryChange$: Subject<string> = new Subject<string>();
   hasDebounced: boolean = false;
 
-  isLoading: boolean = false;
   search: string = '';
   sort: string = '';
   priceRange: PriceRange = {
@@ -57,34 +69,16 @@ export class ProductsComponent implements OnInit {
   };
 
   sortOptions = [
-    {
-      value: 'name:asc',
-      text: 'Name (A to Z)',
-    },
-    {
-      value: 'name:desc',
-      text: 'Name (Z to A)',
-    },
-    {
-      value: 'price:asc',
-      text: 'Price ascending',
-    },
-    {
-      value: 'price:desc',
-      text: 'Price descending',
-    },
-    {
-      value: 'createdAt:asc',
-      text: 'Oldest first',
-    },
-    {
-      value: 'createdAt desc',
-      text: 'Newest first',
-    },
+    { value: 'name:asc', text: 'Name (A to Z)' },
+    { value: 'name:desc', text: 'Name (Z to A)' },
+    { value: 'price:asc', text: 'Price ascending' },
+    { value: 'price:desc', text: 'Price descending' },
+    { value: 'createdAt:asc', text: 'Oldest first' },
+    { value: 'createdAt desc', text: 'Newest first' },
   ];
 
   ngOnInit(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     this.categoryChange$
       .pipe(debounceTime(1000), takeUntilDestroyed(this.destroyRef))
@@ -95,9 +89,9 @@ export class ProductsComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        this.queryParams = params;
-        this.sort = this.queryParams['sort'] || '';
-        this.search = this.queryParams['search'] || '';
+        this.queryParams.set(params);
+        this.sort = params['sort'] || '';
+        this.search = params['search'] || '';
 
         if (!this.hasDebounced) {
           this.fetchProducts();
@@ -106,18 +100,18 @@ export class ProductsComponent implements OnInit {
   }
 
   fetchProducts() {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.apiService
-      .getProducts(this.queryParams)
+      .getProducts(this.queryParams())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((prods) => {
-        this.isLoading = false;
-        this.products = prods;
+        this.isLoading.set(false);
+        this.products.set(prods);
       });
   }
 
   changeCategory(category: string) {
-    if (category == this.queryParams['category']) {
+    if (category == this.queryParams()['category']) {
       return;
     }
 
@@ -141,7 +135,7 @@ export class ProductsComponent implements OnInit {
 
     if (this.search) {
       search = this.search;
-    } else if (this.queryParams['search']) {
+    } else if (this.queryParams()['search']) {
       //   If the user has searched and clears the search
       search = null;
     } else {
@@ -166,7 +160,7 @@ export class ProductsComponent implements OnInit {
   }
 
   onClear() {
-    if (Object.keys(this.queryParams).length < 1) {
+    if (Object.keys(this.queryParams()).length < 1) {
       return;
     }
 
@@ -195,9 +189,5 @@ export class ProductsComponent implements OnInit {
       },
       queryParamsHandling: 'merge',
     });
-  }
-
-  get hasQueryParams() {
-    return !!Object.keys(this.queryParams).length;
   }
 }

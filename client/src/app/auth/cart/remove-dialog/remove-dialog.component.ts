@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import {
   MatDialogClose,
@@ -17,16 +17,17 @@ export interface DialogData {
 }
 
 @Component({
-    selector: 'remove-dialog',
-    templateUrl: 'remove-dialog.component.html',
-    styleUrl: 'remove-dialog.component.css',
-    imports: [
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-    ]
+  selector: 'remove-dialog',
+  templateUrl: 'remove-dialog.component.html',
+  styleUrl: 'remove-dialog.component.css',
+  imports: [
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RemoveDialogComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);

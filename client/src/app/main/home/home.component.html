@@ -15,13 +15,13 @@
           high-quality, customizable furniture accessible to everyone.
         </p>
       </article>
-      @if (products.length == 0) {
+      @if (products().length == 0) {
         <app-loader-card class="card"/>
         <app-loader-card class="card"/>
         <app-loader-card class="card"/>
       }
-      @if (products.length > 0) {
-        @for (product of products; track product) {
+      @if (products().length > 0) {
+        @for (product of products(); track product._id) {
           <article
             class="card"
             [routerLink]="'/products/' + product._id"

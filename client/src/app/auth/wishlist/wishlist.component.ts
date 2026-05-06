@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
@@ -14,10 +21,11 @@ import { PopulatedProduct } from '../../types/Product';
 import { CartStore } from '../cart/cart.store';
 
 @Component({
-    selector: 'app-wishlist',
-    imports: [RouterLink, FloorPricePipe, DecimalSlicePipe],
-    templateUrl: './wishlist.component.html',
-    styleUrl: './wishlist.component.css'
+  selector: 'app-wishlist',
+  imports: [RouterLink, FloorPricePipe, DecimalSlicePipe],
+  templateUrl: './wishlist.component.html',
+  styleUrl: './wishlist.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WishlistComponent implements OnInit {
   authService = inject(AuthService);
@@ -27,34 +35,34 @@ export class WishlistComponent implements OnInit {
   router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  wishlist: PopulatedProduct[] | [] = [];
+  readonly wishlist = signal<PopulatedProduct[]>([]);
 
   ngOnInit(): void {
     this.fetchWishList();
   }
 
   fetchWishList() {
-    this.authService.getWishlist()
+    this.authService
+      .getWishlist()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((wishlist) => {
-        this.wishlist = wishlist;
+        this.wishlist.set(wishlist);
       });
   }
 
   onRemove(prodId: string) {
-    this.apiService.toggleWishList(prodId)
+    this.apiService
+      .toggleWishList(prodId)
       .pipe(
         switchMap((user) => {
-          // sync user
           this.authService.setUserStorage(user);
           this.authService.setUserSubject(user);
-          // refetch list
           return this.authService.getWishlist();
         }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((wishlist) => {
-        this.wishlist = wishlist;
+        this.wishlist.set(wishlist);
       });
   }
 

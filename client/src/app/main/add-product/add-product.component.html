@@ -1,7 +1,7 @@
 <section class="add-product">
   <div class="container" lazyLoad="assets/images/add-prod-back.jpg">
     <div class="form-wrapper">
-      <h1>{{ isEditing ? "Edit" : "Add" }} product</h1>
+      <h1>{{ isEditing() ? "Edit" : "Add" }} product</h1>
       <form action="" class="add-product" [formGroup]="addProductForm">
         <div class="column left">
           <mat-form-field>
@@ -178,10 +178,10 @@
                                               </div>
                                             </form>
                                             <button (click)="handleClick()" [disabled]="addProductForm.invalid">
-                                              @if (!isLoading) {
+                                              @if (!isLoading()) {
                                                 <p>Submit</p>
                                               }
-                                              @if (isLoading) {
+                                              @if (isLoading()) {
                                                 <app-loader type="dots" diameter="26"/>
                                               }
                                             </button>

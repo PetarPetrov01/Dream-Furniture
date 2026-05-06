@@ -1,4 +1,4 @@
-@if (error) {
+@if (error()) {
   <div class="error-container">
     <div class="error">
       <div class="icon">
@@ -6,7 +6,7 @@
       </div>
       <div class="info">
         <h4>ERROR</h4>
-        <p>{{error}}</p>
+        <p>{{ error() }}</p>
       </div>
     </div>
   </div>

@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Router, RouterLink } from '@angular/router';
@@ -13,14 +20,15 @@ import { User } from '../../types/User';
 import { APIProduct } from '../../types/Product';
 
 @Component({
-    selector: 'app-profile',
-    imports: [RouterLink],
-    templateUrl: './profile.component.html',
-    styleUrl: './profile.component.css'
+  selector: 'app-profile',
+  imports: [RouterLink],
+  templateUrl: './profile.component.html',
+  styleUrl: './profile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit {
-  user: User | undefined;
-  products: APIProduct[] | [] = [];
+  readonly user = signal<User | undefined>(undefined);
+  readonly products = signal<APIProduct[]>([]);
 
   authService = inject(AuthService);
   matDialog = inject(MatDialog);
@@ -31,13 +39,13 @@ export class ProfileComponent implements OnInit {
     this.authService.user$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
-        this.user = user;
+        this.user.set(user);
       });
     this.authService
       .getOwnProducts()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((products) => {
-        this.products = products;
+        this.products.set(products);
       });
   }
 
