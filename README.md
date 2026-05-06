@@ -18,12 +18,11 @@ The project consists of two main folders:
 ### Client side
 [Client Documentation](/client/README.md)
 
-The client side is build with the Angular framework. For a better user-expereience the following libraries are used: 
-* NgRx - Reactive state managment for Angular inspired by Redux. Used for the user's cart.
-* ngrx-store-localstorage - Simple syncing between the NgRx store and local storage.
+The client side is built with Angular (currently v20) using standalone components and the signals-based reactivity model throughout. The cart is backed by an injectable signal store with a small `localStorageSignal` helper for persistence; routes are lazy-loaded via `loadComponent`. The following libraries / browser features are used:
 * Angular Material - Material Design components.
-* ngx-cookie-service - Angular service to read, set and delete browser cookies. Used for the authentication.
-* ng-lazyload-image - Lazy image loader.
+* ngx-cookie-service - Angular service to read, set and delete browser cookies. Used for authentication.
+* `Intl.DateTimeFormat` (browser-native) - date formatting in pipes.
+* `loading="lazy"` (browser-native) - image lazy loading.
 
 ### Server side
 [API Documentation](/server/README.md)
