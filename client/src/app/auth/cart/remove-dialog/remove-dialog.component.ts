@@ -8,9 +8,8 @@ import {
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { Store } from '@ngrx/store';
 
-import * as CartActions from '../cart.actions';
+import { CartStore } from '../cart.store';
 
 export interface DialogData {
   productName: string;
@@ -31,9 +30,9 @@ export interface DialogData {
 })
 export class RemoveDialogComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);
-  private store = inject(Store);
+  private cartStore = inject(CartStore);
 
   onConfirm() {
-    this.store.dispatch(CartActions.removeItem({ productId: this.data._id }));
+    this.cartStore.remove(this.data._id);
   }
 }

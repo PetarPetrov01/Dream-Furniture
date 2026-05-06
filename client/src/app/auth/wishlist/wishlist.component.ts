@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
 import { switchMap } from 'rxjs';
-import { Store } from '@ngrx/store';
 
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
@@ -12,9 +11,7 @@ import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
 import { PopulatedProduct } from '../../types/Product';
-import { CartState } from '../../types/State';
-
-import * as CartActions from '../cart/cart.actions';
+import { CartStore } from '../cart/cart.store';
 
 @Component({
     selector: 'app-wishlist',
@@ -25,7 +22,7 @@ import * as CartActions from '../cart/cart.actions';
 export class WishlistComponent implements OnInit {
   authService = inject(AuthService);
   apiService = inject(ApiService);
-  store = inject(Store<CartState>);
+  private cartStore = inject(CartStore);
 
   router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -62,6 +59,6 @@ export class WishlistComponent implements OnInit {
   }
 
   onAddToCart(product: PopulatedProduct) {
-    this.store.dispatch(CartActions.addItem({ product, qty: 1 }));
+    this.cartStore.addItem(product, 1);
   }
 }

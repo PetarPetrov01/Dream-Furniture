@@ -5,21 +5,17 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
-import { tap } from 'rxjs';
-import { Store } from '@ngrx/store';
-
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
 import { PopulatedProduct } from '../../types/Product';
 
-import { CartComponent } from '../../auth/cart/cart.component';
 import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.component';
 
 import { DateFormatterPipe } from '../../shared/pipes/date-formatter.pipe';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 
-import * as CartActions from '../../auth/cart/cart.actions';
+import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
@@ -42,7 +38,7 @@ export class ProductDetailsComponent implements OnInit {
   private notificaionService = inject(NotificationService);
   private matDialog = inject(MatDialog);
   private router = inject(Router);
-  private store = inject<Store<CartComponent>>(Store);
+  private cartStore = inject(CartStore);
   private destroyRef = inject(DestroyRef);
 
   product: PopulatedProduct | null = null;
@@ -113,16 +109,11 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addToCart() {
-    if (this.product) {
-      this.store.dispatch(
-        CartActions.addItem({ product: this.product, qty: this.buyQty })
-      );
-      this.notificaionService.setNotification(
-        'Item added to cart successfully!'
-      );
-    } else {
-      return;
-    }
+    if (!this.product) return;
+    this.cartStore.addItem(this.product, this.buyQty);
+    this.notificaionService.setNotification(
+      'Item added to cart successfully!'
+    );
   }
 
   onInputBlur() {

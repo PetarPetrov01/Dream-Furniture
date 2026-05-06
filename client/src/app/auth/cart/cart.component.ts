@@ -1,11 +1,7 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
 
 import { AuthService } from '../../shared/auth.service';
 import { ApiService } from '../../shared/api.service';
@@ -16,39 +12,31 @@ import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
 import { RemoveDialogComponent } from './remove-dialog/remove-dialog.component';
 import { ClearDialogComponent } from './clear-dialog/clear-dialog.component';
 
-import { CartState, StateProduct } from '../../types/State';
-import * as CartActions from '../cart/cart.actions';
+import { StateProduct } from '../../types/State';
+import { CartStore } from './cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
 
 @Component({
     selector: 'app-cart',
-    imports: [CommonModule, RouterLink, FloorPricePipe, DecimalSlicePipe],
+    imports: [RouterLink, FloorPricePipe, DecimalSlicePipe],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.css'
 })
 export class CartComponent {
-  private store = inject<Store<CartState>>(Store);
+  private cartStore = inject(CartStore);
   private matDialog = inject(MatDialog);
   private authService = inject(AuthService);
   private apiService = inject(ApiService);
   private notificationService = inject(NotificationService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
-  products$: Observable<StateProduct[]> = this.store.select('cart');
-  products: StateProduct[] | null = null;
-
-  constructor() {
-    this.products$
-      .pipe(takeUntilDestroyed())
-      .subscribe((prods) => {
-        this.products = prods;
-      });
-  }
+  readonly products = this.cartStore.items;
+  readonly totalCount = this.cartStore.totalCount;
+  readonly totalPrice = this.cartStore.totalPrice;
 
   handleIncreaseQuantity(currentProduct: StateProduct) {
-    this.store.dispatch(
-      CartActions.addItem({ product: currentProduct, qty: 1 })
-    );
+    this.cartStore.addItem(currentProduct, 1);
   }
 
   handleDecreaseQuantity(currentProduct: StateProduct) {
@@ -63,9 +51,7 @@ export class CartComponent {
         },
       });
     } else {
-      this.store.dispatch(
-        CartActions.decreaseQuantity({ productId: currentProduct._id })
-      );
+      this.cartStore.decrease(currentProduct._id);
     }
   }
 
@@ -100,43 +86,28 @@ export class CartComponent {
   }
 
   handleCompleteOrder() {
-    if (!this.products || this.products?.length == 0) {
-      return;
-    }
+    const items = this.products();
+    if (items.length === 0) return;
 
-    const order = this.products?.map((prod) => {
-      return {
-        product: prod._id,
-        count: prod.quantity,
-      };
-    });
+    const order = items.map((prod) => ({
+      product: prod._id,
+      count: prod.quantity,
+    }));
 
-    this.authService.completeOrder(order!)
+    this.authService
+      .completeOrder(order)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((order) => {
-        this.store.dispatch(CartActions.resetState());
+      .subscribe((completed) => {
+        this.cartStore.reset();
         this.notificationService.setNotification(
-          `Your order №${order._id.slice(-8)} has been approved.`
+          `Your order №${completed._id.slice(-8)} has been approved.`
         );
       });
   }
 
-  get totalCount() {
-    return this.products?.reduce((acc, prod) => acc + prod.quantity, 0);
-  }
-
-  get totalPrice() {
-    return this.products?.reduce(
-      (acc, prod) => acc + prod.quantity * prod.price,
-      0
-    );
-  }
-
   isInWishList(product: StateProduct) {
     return !!this.authService.user?.wishlist?.some(
-      (prod) => prod == product._id
+      (prodId) => prodId == product._id
     );
   }
-
-  private destroyRef = inject(DestroyRef);
 }

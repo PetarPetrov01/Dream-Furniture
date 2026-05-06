@@ -1,17 +1,17 @@
 <section class="cart">
   <div class="container">
-    @if (totalCount) {
+    @if (totalCount()) {
       <div class="products-wrapper">
         <div class="header">
           <h2>
-            Cart <span>Products: {{ totalCount }}</span>
+            Cart <span>Products: {{ totalCount() }}</span>
           </h2>
           <a id="clear-cart-btn" (click)="handleClearCart()">
             Clear cart <i class="fa-regular fa-circle-xmark"></i>
           </a>
         </div>
         <div class="cards-container">
-          @for (product of products$ | async; track $index) {
+          @for (product of products(); track product._id) {
             <div class="card">
               <div class="media">
                 <img [src]="product.image" alt="{{ product.name }}" />
@@ -36,9 +36,8 @@
                   >{{ isInWishList(product) ? "Remove from " : "Add to " }}wishlist
                   <i
                     class="fa-heart"
-                ngClass="{{
-                  isInWishList(product) ? 'fa-solid' : 'fa-regular'
-                }}"
+                    [class.fa-solid]="isInWishList(product)"
+                    [class.fa-regular]="!isInWishList(product)"
                     ></i
                   ></a>
                   <a class="remove-btn" (click)="handleRemove(product)"
@@ -50,27 +49,27 @@
           </div>
         </div>
       }
-      @if (totalCount) {
+      @if (totalCount()) {
         <div class="order">
           <h2>Order info</h2>
           <div class="final-price">
             <h4>
               <p>Products:</p>
               <p id="products-price">
-                ${{ totalPrice! | floorPrice
-                }}<span>{{ totalPrice! | decimalSlice }}</span>
+                ${{ totalPrice() | floorPrice
+                }}<span>{{ totalPrice() | decimalSlice }}</span>
               </p>
             </h4>
             <h4>Delivery: <span>FREE</span></h4>
             <h2>
-              Total: ${{ totalPrice! | floorPrice }}
-              <span>{{ totalPrice! | decimalSlice }}</span>
+              Total: ${{ totalPrice() | floorPrice }}
+              <span>{{ totalPrice() | decimalSlice }}</span>
             </h2>
           </div>
           <a (click)="handleCompleteOrder()">Complete order</a>
         </div>
       }
-      @if (!totalCount) {
+      @if (!totalCount()) {
         <div class="no-products">
           <div class="div">
             <img src="assets/images/empty-cart.png" alt="" />

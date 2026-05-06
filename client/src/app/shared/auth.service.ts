@@ -8,9 +8,8 @@ import { cookieName } from '../auth/auth.component';
 
 import { APIProduct, PopulatedProduct } from '../types/Product';
 import { User } from '../types/User';
-import { Store } from '@ngrx/store';
 
-import * as CartActions from '../auth/cart/cart.actions';
+import { CartStore } from '../auth/cart/cart.store';
 import { APIOrder, Order } from '../types/Order';
 
 @Injectable({
@@ -19,7 +18,7 @@ import { APIOrder, Order } from '../types/Order';
 export class AuthService {
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
-  private store = inject(Store);
+  private cartStore = inject(CartStore);
 
   private user$$ = new BehaviorSubject<User | undefined>(undefined);
   public user$ = this.user$$.asObservable();
@@ -113,7 +112,7 @@ export class AuthService {
     localStorage.removeItem('[user]');
     this.user$$.next(undefined);
     this.cookieService.delete(cookieName, '/');
-    this.store.dispatch(CartActions.resetState());
+    this.cartStore.reset();
 
     this.http.get('/api/auth/logout').subscribe();
   }

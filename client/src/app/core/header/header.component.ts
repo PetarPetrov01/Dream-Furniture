@@ -2,14 +2,11 @@ import { Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
-import { Store } from '@ngrx/store';
-
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 
 import { AuthService } from '../../shared/auth.service';
-
-import { CartState } from '../../types/State';
+import { CartStore } from '../../auth/cart/cart.store';
 
 @Component({
     selector: 'app-header',
@@ -20,19 +17,10 @@ import { CartState } from '../../types/State';
 export class HeaderComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
-  private store = inject<Store<CartState>>(Store);
+  private cartStore = inject(CartStore);
   location = inject(Location);
 
-  cartQuantity: number = 0;
-
-  constructor() {
-    this.store.select('cart').subscribe((prods) => {
-      this.cartQuantity = prods.reduce(
-        (acc, prod) => (acc += prod.quantity),
-        0
-      );
-    });
-  }
+  readonly cartQuantity = this.cartStore.totalCount;
 
   get isLogged() {
     return this.authService.isLogged;

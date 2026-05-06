@@ -7,9 +7,8 @@ import {
   MatDialogContent,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { Store } from '@ngrx/store';
 
-import * as CartActions from '../cart.actions';
+import { CartStore } from '../cart.store';
 
 @Component({
     selector: 'app-clear-dialog',
@@ -24,9 +23,9 @@ import * as CartActions from '../cart.actions';
     ]
 })
 export class ClearDialogComponent {
-  private store = inject(Store);
+  private cartStore = inject(CartStore);
 
   onConfirm() {
-    this.store.dispatch(CartActions.resetState());
+    this.cartStore.reset();
   }
 }

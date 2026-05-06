@@ -37,8 +37,8 @@
             <a routerLinkActive="active" routerLink="/cart"
               ><i
               class="fa-solid fa-cart-shopping"
-              [matBadge]="cartQuantity > 9 ? '9+' : cartQuantity"
-              [matBadgeHidden]="cartQuantity == 0"
+              [matBadge]="cartQuantity() > 9 ? '9+' : cartQuantity()"
+              [matBadgeHidden]="cartQuantity() === 0"
               matBadgeColor="warn"
               matBadgeSize="small"
               ></i
