@@ -1,35 +1,33 @@
 import { Routes } from '@angular/router';
 
-import { HomeComponent } from './main/home/home.component';
-import { ProductsComponent } from './main/products/products.component';
-import { AddProductComponent } from './main/add-product/add-product.component';
-import { ProductDetailsComponent } from './main/product-details/product-details.component';
-
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
-import { ProfileComponent } from './auth/profile/profile.component';
-import { WishlistComponent } from './auth/wishlist/wishlist.component';
-import { CartComponent } from './auth/cart/cart.component';
-
 import { isGuestGuard, isUserGuard } from './guards/auth.guard';
-import { NotFoundComponent } from './main/not-found/not-found.component';
-import { Component } from '@angular/core';
-import { OrdersComponent } from './auth/orders/orders.component';
 
 const productRoutes = {
   path: 'products',
   children: [
     {
       path: '',
-      component: ProductsComponent,
+      loadComponent: () =>
+        import('./main/products/products.component').then(
+          (m) => m.ProductsComponent
+        ),
     },
     {
       path: ':id',
       children: [
-        { path: '', component: ProductDetailsComponent },
+        {
+          path: '',
+          loadComponent: () =>
+            import('./main/product-details/product-details.component').then(
+              (m) => m.ProductDetailsComponent
+            ),
+        },
         {
           path: 'edit',
-          component: AddProductComponent,
+          loadComponent: () =>
+            import('./main/add-product/add-product.component').then(
+              (m) => m.AddProductComponent
+            ),
           canActivate: [isUserGuard],
         },
       ],
@@ -41,10 +39,17 @@ const authRoutes = {
   path: 'auth',
   canActivate: [isGuestGuard],
   children: [
-    { path: 'login', component: LoginComponent },
+    {
+      path: 'login',
+      loadComponent: () =>
+        import('./auth/login/login.component').then((m) => m.LoginComponent),
+    },
     {
       path: 'register',
-      component: RegisterComponent,
+      loadComponent: () =>
+        import('./auth/register/register.component').then(
+          (m) => m.RegisterComponent
+        ),
     },
   ],
 };
@@ -53,15 +58,25 @@ const profileRoutes = {
   path: 'profile',
   canActivate: [isUserGuard],
   children: [
-    { path: '', component: ProfileComponent },
+    {
+      path: '',
+      loadComponent: () =>
+        import('./auth/profile/profile.component').then(
+          (m) => m.ProfileComponent
+        ),
+    },
     {
       path: 'wishlist',
-      component: WishlistComponent,
+      loadComponent: () =>
+        import('./auth/wishlist/wishlist.component').then(
+          (m) => m.WishlistComponent
+        ),
     },
     {
       path: 'orders',
-      component: OrdersComponent
-    }
+      loadComponent: () =>
+        import('./auth/orders/orders.component').then((m) => m.OrdersComponent),
+    },
   ],
 };
 
@@ -73,16 +88,31 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    component: HomeComponent,
+    loadComponent: () =>
+      import('./main/home/home.component').then((m) => m.HomeComponent),
   },
   productRoutes,
   {
     path: 'add-product',
-    component: AddProductComponent,
+    loadComponent: () =>
+      import('./main/add-product/add-product.component').then(
+        (m) => m.AddProductComponent
+      ),
     canActivate: [isUserGuard],
   },
-  { path: 'cart', component: CartComponent, canActivate: [isUserGuard] },
+  {
+    path: 'cart',
+    loadComponent: () =>
+      import('./auth/cart/cart.component').then((m) => m.CartComponent),
+    canActivate: [isUserGuard],
+  },
   authRoutes,
   profileRoutes,
-  { path: '**', component: NotFoundComponent },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./main/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent
+      ),
+  },
 ];
