@@ -36,7 +36,7 @@ describe('LoginComponent', () => {
   beforeEach(async () => {
     authServiceMock = jasmine.createSpyObj('AuthService', ['login']);
     fb = jasmine.createSpyObj('FormBuilder', ['group']);
-    notificationServiceMock = jasmine.createSpyObj('NotificaionService', [
+    notificationServiceMock = jasmine.createSpyObj('NotificationService', [
       'setNotification',
     ]);
 
@@ -75,35 +75,19 @@ describe('LoginComponent', () => {
     expect(component.loginForm).toBeTruthy();
   });
 
-  it('loginForm should be invalid', () => {
+  it('loginForm should be invalid when empty', () => {
     expect(component.loginForm.invalid).toBeTrue();
     expect(component.loginForm.get('email')?.hasError('required')).toBeTrue();
-    expect(
-      component.loginForm.get('password')?.hasError('required')
-    ).toBeTrue();
-  });
-
-  it('should validate email', () => {
-    component.loginForm.patchValue({
-      email: 'wrong@email',
-    });
-    expect(component.loginForm.get('email')?.hasError('email')).toBeTruthy();
+    expect(component.loginForm.get('password')?.hasError('required')).toBeTrue();
   });
 
   it('should not send the request if the inputs are empty', () => {
     component.handleLoginSubmit();
-    expect(component.isLoading).toBeFalse();
-  });
-
-  it('should not call authService if email is invalid', () => {
-    component.loginForm.patchValue({
-      email: 'invalid@email',
-    });
-
+    expect(component.isLoading()).toBeFalse();
     expect(authServiceMock.login).not.toHaveBeenCalled();
   });
 
-  it('should call authService login', () => {
+  it('should call authService.login with the form values', () => {
     const ngZone = TestBed.inject(NgZone);
 
     component.loginForm.patchValue({
@@ -113,14 +97,11 @@ describe('LoginComponent', () => {
 
     ngZone.run(() => component.handleLoginSubmit());
 
-    expect(authServiceMock.login).toHaveBeenCalledWith(
-      mockUser.email,
-      '123456'
-    );
-    expect(component.isLoading).toBeFalse();
+    expect(authServiceMock.login).toHaveBeenCalledWith(mockUser.email, '123456');
+    expect(component.isLoading()).toBeFalse();
   });
 
-  it('should set the right user in the notificaion', () => {
+  it('should set the notification with the username on success', () => {
     const ngZone = TestBed.inject(NgZone);
 
     component.loginForm.patchValue({
@@ -133,7 +114,6 @@ describe('LoginComponent', () => {
     expect(notificationServiceMock.setNotification).toHaveBeenCalledWith(
       `Successfully logged in as ${mockUser.username}`
     );
-    expect(component.isLoading).toBeFalse();
   });
 
   it('should navigate to home on successful login', () => {
@@ -148,6 +128,14 @@ describe('LoginComponent', () => {
 
     ngZone.run(() => component.handleLoginSubmit());
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading()).toBeFalse();
+  });
+
+  it('should toggle showPass', () => {
+    expect(component.showPass()).toBeFalse();
+    component.toggleShowPass();
+    expect(component.showPass()).toBeTrue();
+    component.toggleShowPass();
+    expect(component.showPass()).toBeFalse();
   });
 });

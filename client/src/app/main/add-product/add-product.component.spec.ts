@@ -1,18 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AddProductComponent } from './add-product.component';
-import { RouterTestingModule } from '@angular/router/testing';
-import { ApiService } from '../../shared/api.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ProductsComponent } from '../products/products.component';
 import { ActivatedRoute, Params } from '@angular/router';
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
+
+import { BehaviorSubject, EMPTY, of } from 'rxjs';
+
+import { AddProductComponent } from './add-product.component';
+import { ProductsComponent } from '../products/products.component';
+import { ApiService } from '../../shared/api.service';
+
 import { PopulatedProduct } from '../../types/Product';
 import { User } from '../../types/User';
 
@@ -20,10 +22,11 @@ describe('AddProductComponent', () => {
   let component: AddProductComponent;
   let fixture: ComponentFixture<AddProductComponent>;
   let apiServiceMock: jasmine.SpyObj<ApiService>;
-  let activatedRouteMock: jasmine.SpyObj<ActivatedRoute>;
+  let activatedRouteMock: any;
   let fb: jasmine.SpyObj<FormBuilder>;
 
-  const paramsSubject = new BehaviorSubject<Params>({});
+  let paramsSubject: BehaviorSubject<Params>;
+
   const mockUser: User = {
     _id: '123',
     email: 'testemail@gmail.com',
@@ -38,11 +41,7 @@ describe('AddProductComponent', () => {
     image: 'test/img',
     category: ['test'],
     style: 'test',
-    dimensions: {
-      height: 1,
-      width: 1,
-      depth: 1,
-    },
+    dimensions: { height: 1, width: 1, depth: 1 },
     material: ['test'],
     color: 'test',
     price: 1,
@@ -52,9 +51,17 @@ describe('AddProductComponent', () => {
   };
 
   beforeEach(async () => {
-    apiServiceMock = jasmine.createSpyObj('ApiService', ['getProduct','addProduct','updateProduct']);
-    activatedRouteMock = jasmine.createSpyObj('ActivatedRoute', ['params']);
+    // Fresh subject each test so describe-scoped state can't leak.
+    paramsSubject = new BehaviorSubject<Params>({});
+
+    apiServiceMock = jasmine.createSpyObj('ApiService', [
+      'getProduct',
+      'addProduct',
+      'updateProduct',
+    ]);
     fb = jasmine.createSpyObj('FormBuilder', ['group']);
+
+    activatedRouteMock = { params: paramsSubject.asObservable() };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -67,12 +74,11 @@ describe('AddProductComponent', () => {
       providers: [
         { provide: ApiService, useValue: apiServiceMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: FormBuilder, useValiue: fb },
+        { provide: FormBuilder, useValue: fb },
       ],
     }).compileComponents();
 
     apiServiceMock.getProduct.and.returnValue(EMPTY);
-    activatedRouteMock.params = paramsSubject.asObservable();
 
     fb.group.and.returnValue(
       new FormGroup({
@@ -100,41 +106,30 @@ describe('AddProductComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should not call apiService if params is empty', async () => {
-    paramsSubject.next({});
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    component.ngOnInit();
-    expect(component.isEditing).toBeFalse();
+  it('should not call apiService when params are empty', () => {
+    expect(component.isEditing()).toBeFalse();
     expect(apiServiceMock.getProduct).not.toHaveBeenCalled();
   });
 
-  it('should get the products if product id is in the params', async () => {
+  it('should fetch the product when an id is in the params', () => {
     paramsSubject.next({ id: '123' });
-
-    fixture.detectChanges();
-
-    component.ngOnInit();
-    expect(component.isEditing).toBeTrue();
+    expect(component.isEditing()).toBeTrue();
     expect(apiServiceMock.getProduct).toHaveBeenCalledWith('123');
   });
 
-  it('should patch the form when the product is fetched', async () => {
-    paramsSubject.next({ id: '123' });
+  it('should patch the form when the product is fetched', () => {
     apiServiceMock.getProduct.and.returnValue(of(mockProduct));
+    paramsSubject.next({ id: '123' });
 
-    fixture.detectChanges();
-
-    component.ngOnInit();
     const modifiedProd = { ...mockProduct, ...mockProduct.dimensions };
 
-    //Not all properties are passed to the form!
     Object.entries(component.addProductForm.value).forEach(([k, value]) => {
-
-      // dimensions and price are cast to string in the component!!
-      if ((mockProduct.dimensions as any)[k] == true || k == 'price') {
+      // dimensions and price are cast to string in the component;
+      // (mockProduct.dimensions as any)[k] is a numeric truthy value
+      // for the dimension keys (height, width, depth), which is why
+      // `== true` works to identify them.
+      // eslint-disable-next-line eqeqeq
+      if ((mockProduct.dimensions as any)[k] == true || k === 'price') {
         expect(value).toEqual(String((modifiedProd as any)[k]));
       } else {
         expect(value).toEqual((modifiedProd as any)[k]);
@@ -142,12 +137,10 @@ describe('AddProductComponent', () => {
     });
   });
 
-  it('should do nothing on submit if forms is invalid', async ()=>{
-    paramsSubject.next({});
-
-    fixture.detectChanges()
-
-    component.handleClick()
+  it('should do nothing on submit if the form is invalid', () => {
+    component.handleClick();
     expect(component.addProductForm.valid).toBeFalse();
-  })
+    expect(apiServiceMock.addProduct).not.toHaveBeenCalled();
+    expect(apiServiceMock.updateProduct).not.toHaveBeenCalled();
+  });
 });

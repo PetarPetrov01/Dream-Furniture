@@ -1,15 +1,14 @@
-import { NgZone } from '@angular/core';
+import { NgZone, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-
+import { EMPTY, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { AuthService } from '../../shared/auth.service';
 import { ApiService } from '../../shared/api.service';
 import { CartComponent } from './cart.component';
+import { CartStore } from './cart.store';
 
 import { User } from '../../types/User';
 import { StateProduct } from '../../types/State';
@@ -20,10 +19,13 @@ describe('CartComponent', () => {
 
   let authServiceMock: jasmine.SpyObj<AuthService>;
   let apiServiceMock: jasmine.SpyObj<ApiService>;
-  let storeMock: jasmine.SpyObj<Store>;
-  let matDiaologMock: jasmine.SpyObj<MatDialog>;
+  let cartStoreMock: jasmine.SpyObj<CartStore>;
+  let matDialogMock: jasmine.SpyObj<MatDialog>;
 
-  const productsSubjectMock = new BehaviorSubject<StateProduct[]>([]);
+  // Writable signals so individual tests can drive the store state.
+  const itemsSig = signal<StateProduct[]>([]);
+  const totalCountSig = signal(0);
+  const totalPriceSig = signal(0);
 
   const mockUser: User = {
     _id: '123',
@@ -39,11 +41,7 @@ describe('CartComponent', () => {
     image: '',
     category: [''],
     style: '',
-    dimensions: {
-      height: 1,
-      width: 1,
-      depth: 1,
-    },
+    dimensions: { height: 1, width: 1, depth: 1 },
     material: [''],
     color: '',
     price: 1,
@@ -53,8 +51,6 @@ describe('CartComponent', () => {
     createdAt: '2024-03-10T11:27:12.452+00:00',
   };
 
-  const mockCartState: StateProduct[] = [mockProduct];
-
   beforeEach(async () => {
     authServiceMock = jasmine.createSpyObj(
       'AuthService',
@@ -62,8 +58,21 @@ describe('CartComponent', () => {
       { user: {} }
     );
     apiServiceMock = jasmine.createSpyObj('ApiService', ['toggleWishList']);
-    storeMock = jasmine.createSpyObj('Store', ['dispatch', 'select']);
-    matDiaologMock = jasmine.createSpyObj('MatDiaolog', ['open']);
+    cartStoreMock = jasmine.createSpyObj(
+      'CartStore',
+      ['addItem', 'decrease', 'remove', 'reset'],
+      {
+        items: itemsSig,
+        totalCount: totalCountSig,
+        totalPrice: totalPriceSig,
+      }
+    );
+    matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);
+
+    // Reset signal state per test.
+    itemsSig.set([]);
+    totalCountSig.set(0);
+    totalPriceSig.set(0);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -75,12 +84,10 @@ describe('CartComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceMock },
         { provide: ApiService, useValue: apiServiceMock },
-        { provide: Store, useValue: storeMock },
-        { provide: MatDialog, useValue: matDiaologMock },
+        { provide: CartStore, useValue: cartStoreMock },
+        { provide: MatDialog, useValue: matDialogMock },
       ],
     }).compileComponents();
-
-    storeMock.select.and.returnValue(productsSubjectMock.asObservable());
 
     fixture = TestBed.createComponent(CartComponent);
     component = fixture.componentInstance;
@@ -91,91 +98,73 @@ describe('CartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('The cart should be empty', () => {
-    productsSubjectMock.next([]);
-    expect(component.products?.length).toBeFalsy();
+  it('the cart should be empty initially', () => {
+    expect(component.products()).toEqual([]);
+    expect(component.totalCount()).toBe(0);
   });
 
-  it('The cart should have products', () => {
-    productsSubjectMock.next(mockCartState);
-    expect(component.products).toBeTruthy();
-    expect(component.products).toEqual(mockCartState);
+  it('the cart should expose products from the store', () => {
+    itemsSig.set([mockProduct]);
+    expect(component.products()).toEqual([mockProduct]);
   });
 
-  it('Should dispatch on quantity increase', () => {
+  it('should call addItem on quantity increase', () => {
     component.handleIncreaseQuantity(mockProduct);
-    expect(storeMock.dispatch).toHaveBeenCalled();
+    expect(cartStoreMock.addItem).toHaveBeenCalledWith(mockProduct, 1);
   });
 
-  it('Should dispatch on quantity decrease (quantity > 1)', () => {
+  it('should call decrease on quantity decrease (quantity > 1)', () => {
     component.handleDecreaseQuantity({ ...mockProduct, quantity: 2 });
-    expect(storeMock.dispatch).toHaveBeenCalled();
+    expect(cartStoreMock.decrease).toHaveBeenCalledWith(mockProduct._id);
   });
 
-  it('Should open modal on quantity decrease (when quantity <=1)', () => {
+  it('should open modal on quantity decrease (when quantity <= 1)', () => {
     component.handleDecreaseQuantity(mockProduct);
-    expect(matDiaologMock.open).toHaveBeenCalled();
+    expect(matDialogMock.open).toHaveBeenCalled();
   });
 
-  it('Should dispatch on wish list toggle', () => {
+  it('should call toggleWishList on wishlist toggle', () => {
     apiServiceMock.toggleWishList.and.returnValue(EMPTY);
-
     component.toggleWishlist(mockProduct);
-
     expect(apiServiceMock.toggleWishList).toHaveBeenCalled();
   });
 
-  it("Should set the product in the user's wishlist", () => {
+  it("should sync the user when the wishlist toggle returns", () => {
     const ngZone = TestBed.inject(NgZone);
+    const updatedUser = { ...mockUser, wishlist: ['123'] };
+    apiServiceMock.toggleWishList.and.returnValue(of(updatedUser));
 
-    apiServiceMock.toggleWishList.and.returnValue(
-      of({ ...mockUser, wishlist: ['123'] })
-    );
     ngZone.run(() => component.toggleWishlist(mockProduct));
 
-    expect(authServiceMock.setUserStorage).toHaveBeenCalledWith({
-      ...mockUser,
-      wishlist: ['123'],
-    });
-    expect(authServiceMock.setUserSubject).toHaveBeenCalledWith({
-      ...mockUser,
-      wishlist: ['123'],
-    });
+    expect(authServiceMock.setUserStorage).toHaveBeenCalledWith(updatedUser);
+    expect(authServiceMock.setUserSubject).toHaveBeenCalledWith(updatedUser);
   });
 
-  it('Should open modal on cart clear', () => {
+  it('should open modal on cart clear', () => {
     component.handleClearCart();
-    expect(matDiaologMock.open).toHaveBeenCalled();
+    expect(matDialogMock.open).toHaveBeenCalled();
   });
 
-  it('Should open modal on product remove', () => {
+  it('should open modal on product remove', () => {
     component.handleRemove(mockProduct);
-    expect(matDiaologMock.open).toHaveBeenCalled();
+    expect(matDialogMock.open).toHaveBeenCalled();
   });
 
-  it('Should return total count', () => {
-    productsSubjectMock.next(new Array(3).fill(mockProduct));
-    expect(component.totalCount).toEqual(3);
+  it('should expose totalCount and totalPrice from the store', () => {
+    totalCountSig.set(3);
+    totalPriceSig.set(30);
+    expect(component.totalCount()).toBe(3);
+    expect(component.totalPrice()).toBe(30);
   });
 
-  it('Should return total price', () => {
-    productsSubjectMock.next([
-      { ...mockProduct, price: 10 },
-      { ...mockProduct, price: 20 },
-    ]);
-    expect(component.totalPrice).toEqual(30);
-  });
-
-  it('Should not complete the order with no products', () => {
-    productsSubjectMock.next([]);
-
+  it('should not complete the order when the cart is empty', () => {
+    itemsSig.set([]);
     component.handleCompleteOrder();
     expect(authServiceMock.completeOrder).not.toHaveBeenCalled();
   });
 
-  it('Should complete the order', () => {
-    productsSubjectMock.next(mockCartState);
-
+  it('should complete the order when the cart has items', () => {
+    itemsSig.set([mockProduct]);
     authServiceMock.completeOrder.and.returnValue(EMPTY);
     component.handleCompleteOrder();
     expect(authServiceMock.completeOrder).toHaveBeenCalled();

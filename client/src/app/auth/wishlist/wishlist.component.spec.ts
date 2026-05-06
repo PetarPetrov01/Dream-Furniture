@@ -1,18 +1,15 @@
-import {
-  ComponentFixture,
-  TestBed,
-  tick,
-  fakeAsync,
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { WishlistComponent } from './wishlist.component';
 
-import { Store } from '@ngrx/store';
+import { EMPTY, of } from 'rxjs';
+
+import { WishlistComponent } from './wishlist.component';
 import { ApiService } from '../../shared/api.service';
+import { AuthService } from '../../shared/auth.service';
+import { CartStore } from '../cart/cart.store';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
-import { AuthService } from '../../shared/auth.service';
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
+
 import { PopulatedProduct } from '../../types/Product';
 import { User } from '../../types/User';
 
@@ -22,9 +19,7 @@ describe('WishlistComponent', () => {
 
   let authServiceMock: jasmine.SpyObj<AuthService>;
   let apiServiceMock: jasmine.SpyObj<ApiService>;
-  let storeMock: jasmine.SpyObj<Store>;
-
-  const wishlistSubjectMock = new BehaviorSubject<PopulatedProduct[]>([]);
+  let cartStoreMock: jasmine.SpyObj<CartStore>;
 
   const mockUser: User = {
     _id: '123',
@@ -40,11 +35,7 @@ describe('WishlistComponent', () => {
     image: '',
     category: [''],
     style: '',
-    dimensions: {
-      height: 1,
-      width: 1,
-      depth: 1,
-    },
+    dimensions: { height: 1, width: 1, depth: 1 },
     material: [''],
     color: '',
     price: 1,
@@ -60,7 +51,9 @@ describe('WishlistComponent', () => {
       'setUserSubject',
     ]);
     apiServiceMock = jasmine.createSpyObj('ApiService', ['toggleWishList']);
-    storeMock = jasmine.createSpyObj('Store', ['dispatch']);
+    cartStoreMock = jasmine.createSpyObj('CartStore', ['addItem']);
+
+    authServiceMock.getWishlist.and.returnValue(EMPTY);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -72,63 +65,50 @@ describe('WishlistComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceMock },
         { provide: ApiService, useValue: apiServiceMock },
-        { provide: Store, useValue: storeMock },
+        { provide: CartStore, useValue: cartStoreMock },
       ],
     }).compileComponents();
-  });
-
-  beforeEach(() => {
-    authServiceMock.getWishlist.and.returnValue(
-      wishlistSubjectMock.asObservable()
-    );
 
     fixture = TestBed.createComponent(WishlistComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('Test config', () => {
-    expect(true).toBeTruthy();
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('Should fetch wish list on init', () => {
-    wishlistSubjectMock.next([]);
-    component.ngOnInit();
+  it('should fetch the wishlist on init', () => {
     expect(authServiceMock.getWishlist).toHaveBeenCalled();
   });
 
-  it('Wishlist should be empty', () => {
-    wishlistSubjectMock.next([]);
-    expect(component.wishlist.length).toBeFalsy();
+  it('the wishlist should be empty initially', () => {
+    expect(component.wishlist()).toEqual([]);
   });
 
-  it('Should set the wishlist', () => {
-    wishlistSubjectMock.next(new Array(3).fill(mockProduct));
-
-    component.fetchWishList();
-    expect(component.wishlist.length).toEqual(3);
-    expect(component.wishlist[0]).toEqual(mockProduct);
-  });
-
-  it('Removing should set the returned user with removed item', () => {
-    apiServiceMock.toggleWishList.and.returnValue(
-      of({ ...mockUser, wishlist: [] })
+  it('should set the wishlist when the service emits', () => {
+    authServiceMock.getWishlist.and.returnValue(
+      of(new Array(3).fill(mockProduct))
     );
+    component.fetchWishList();
+    expect(component.wishlist().length).toBe(3);
+    expect(component.wishlist()[0]).toEqual(mockProduct);
+  });
+
+  it('removing should sync the returned user', () => {
+    const updatedUser = { ...mockUser, wishlist: [] };
+    apiServiceMock.toggleWishList.and.returnValue(of(updatedUser));
+    authServiceMock.getWishlist.and.returnValue(of([]));
 
     component.onRemove('123');
+
     expect(apiServiceMock.toggleWishList).toHaveBeenCalledWith('123');
-    expect(authServiceMock.setUserStorage).toHaveBeenCalledWith({
-      ...mockUser,
-      wishlist: [],
-    });
-    expect(authServiceMock.setUserSubject).toHaveBeenCalledWith({
-      ...mockUser,
-      wishlist: [],
-    });
+    expect(authServiceMock.setUserStorage).toHaveBeenCalledWith(updatedUser);
+    expect(authServiceMock.setUserSubject).toHaveBeenCalledWith(updatedUser);
   });
 
-  it('Add to cart should dispatch the store', () => {
+  it('add to cart should call CartStore.addItem with qty=1', () => {
     component.onAddToCart(mockProduct);
-    expect(storeMock.dispatch).toHaveBeenCalled();
+    expect(cartStoreMock.addItem).toHaveBeenCalledWith(mockProduct, 1);
   });
 });
