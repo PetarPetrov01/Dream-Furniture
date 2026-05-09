@@ -18,9 +18,11 @@ import { PopulatedProduct } from '../../types/Product';
 
 import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.component';
 
-import { DateFormatterPipe } from '../../shared/pipes/date-formatter.pipe';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
+
+import { ImageGalleryComponent } from './image-gallery/image-gallery.component';
+import { SpecTableComponent } from './spec-table/spec-table.component';
 
 import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
@@ -32,9 +34,10 @@ import { CART_MAX_QTY, DIALOG_DEFAULTS } from '../../shared/ui-constants';
     CommonModule,
     FormsModule,
     RouterLink,
-    DateFormatterPipe,
     FloorPricePipe,
     DecimalSlicePipe,
+    ImageGalleryComponent,
+    SpecTableComponent,
   ],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css',
@@ -86,6 +89,10 @@ export class ProductDetailsComponent implements OnInit {
     return this.authService.user?.wishlist.some(
       (prodId) => prodId == this.productId
     );
+  }
+
+  get isInStock() {
+    return this.product()?.inStock !== false;
   }
 
   monthlyPrice(price: number | undefined): string {

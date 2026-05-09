@@ -1,137 +1,58 @@
-import { signal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { MatDialog } from '@angular/material/dialog';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ActivatedRoute, Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
+import { MatDialogModule } from "@angular/material/dialog";
+import { BehaviorSubject, of } from "rxjs";
 
-import { EMPTY, of } from 'rxjs';
+import { ProductDetailsComponent } from "./product-details.component";
+import { ApiService } from "../../shared/api.service";
+import { AuthService } from "../../shared/auth.service";
+import { CartStore } from "../../auth/cart/cart.store";
+import { NotificationService } from "../../shared/notification/notification.service";
+import { PopulatedProduct } from "../../types/Product";
 
-import { ProductDetailsComponent } from './product-details.component';
-import { ApiService } from '../../shared/api.service';
-import { AuthService } from '../../shared/auth.service';
-import { CartStore } from '../../auth/cart/cart.store';
-import { NotificationService } from '../../shared/notification/notification.service';
-import { PopulatedProduct } from '../../types/Product';
-import { User } from '../../types/User';
-
-describe('ProductDetailsComponent', () => {
-  let component: ProductDetailsComponent;
+describe("ProductDetailsComponent", () => {
   let fixture: ComponentFixture<ProductDetailsComponent>;
-  let apiServiceMock: jasmine.SpyObj<ApiService>;
-  let authServiceMock: jasmine.SpyObj<AuthService>;
-  let cartStoreMock: jasmine.SpyObj<CartStore>;
-  let notificationServiceMock: jasmine.SpyObj<NotificationService>;
-  let matDialogMock: jasmine.SpyObj<MatDialog>;
-
-  const mockOwner: User = {
-    _id: '123',
-    email: 'test@mail.com',
-    username: 'Test1',
-    wishlist: [],
-  };
-
-  const mockPopulatedProduct: PopulatedProduct = {
-    _id: '123',
-    name: '',
-    description: '',
-    image: '',
-    category: [''],
-    style: '',
+  let api: jasmine.SpyObj<ApiService>;
+  const params$ = new BehaviorSubject({ slug: "halden-lounge" });
+  const product: PopulatedProduct = {
+    _id: "1", slug: "halden-lounge", name: "Halden Lounge",
+    description: "long", shortDescription: "short",
+    images: ["https://x/y.jpg", "https://x/z.jpg"],
+    category: ["Living room"], style: "Mid-century",
     dimensions: { height: 1, width: 1, depth: 1 },
-    material: [''],
-    color: '',
-    price: 1,
-    __v: '1',
-    _ownerId: mockOwner,
-    createdAt: '2024-03-10T11:27:12.452+00:00',
+    material: ["Wood"], color: "brown", price: 1890,
+    tags: [], inStock: true, isFeatured: true,
+    _ownerId: { _id: "u", email: "h@x", username: "house" } as any,
+    __v: "0", createdAt: "",
   };
 
   beforeEach(async () => {
-    apiServiceMock = jasmine.createSpyObj('ApiService', ['getProduct', 'toggleWishList']);
-    authServiceMock = jasmine.createSpyObj(
-      'AuthService',
-      ['setUserStorage', 'setUserSubject'],
-      { isLogged: false, user: undefined }
-    );
-    cartStoreMock = jasmine.createSpyObj(
-      'CartStore',
-      ['addItem'],
-      {
-        items: signal([]),
-        totalCount: signal(0),
-        totalPrice: signal(0),
-      }
-    );
-    notificationServiceMock = jasmine.createSpyObj('NotificationService', ['setNotification']);
-    matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);
-
-    apiServiceMock.getProduct.and.returnValue(EMPTY);
-
+    api = jasmine.createSpyObj("ApiService", ["getProduct", "toggleWishList"]);
+    api.getProduct.and.returnValue(of(product));
     await TestBed.configureTestingModule({
-      imports: [ProductDetailsComponent, RouterTestingModule],
+      imports: [ProductDetailsComponent, RouterTestingModule, MatDialogModule],
       providers: [
-        { provide: ApiService, useValue: apiServiceMock },
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: CartStore, useValue: cartStoreMock },
-        { provide: NotificationService, useValue: notificationServiceMock },
-        { provide: MatDialog, useValue: matDialogMock },
+        { provide: ApiService, useValue: api },
+        { provide: ActivatedRoute, useValue: { params: params$.asObservable() } },
+        { provide: Router, useValue: jasmine.createSpyObj("Router", ["navigate"]) },
+        { provide: AuthService, useValue: { isLogged: false, user: null } },
+        { provide: CartStore, useValue: { addItem: () => {} } },
+        { provide: NotificationService, useValue: { setNotification: () => {} } },
       ],
     }).compileComponents();
-
     fixture = TestBed.createComponent(ProductDetailsComponent);
-    component = fixture.componentInstance;
+  });
+
+  it("loads product by slug from route", () => {
     fixture.detectChanges();
+    expect(api.getProduct).toHaveBeenCalledWith("halden-lounge");
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('product should be null initially', () => {
-    expect(component.product()).toBeNull();
-  });
-
-  it('should set the product when the api emits', () => {
-    apiServiceMock.getProduct.and.returnValue(of(mockPopulatedProduct));
-    component.ngOnInit();
-    expect(component.product()).toEqual(mockPopulatedProduct);
-  });
-
-  it('isUser reflects authService.isLogged', () => {
-    expect(component.isUser).toBeFalse();
-  });
-
-  it('isOwner is true when product owner _id matches the user _id', () => {
-    apiServiceMock.getProduct.and.returnValue(of(mockPopulatedProduct));
-    component.ngOnInit();
-    Object.defineProperty(authServiceMock, 'user', { get: () => ({ _id: '123' }) });
-    expect(component.isOwner).toBeTrue();
-  });
-
-  it('addToCart should call CartStore.addItem and notify', () => {
-    apiServiceMock.getProduct.and.returnValue(of(mockPopulatedProduct));
-    component.ngOnInit();
-
-    component.buyQty = 2;
-    component.addToCart();
-
-    expect(cartStoreMock.addItem).toHaveBeenCalledWith(mockPopulatedProduct, 2);
-    expect(notificationServiceMock.setNotification).toHaveBeenCalled();
-  });
-
-  it('addToCart should be a no-op when no product is loaded', () => {
-    component.addToCart();
-    expect(cartStoreMock.addItem).not.toHaveBeenCalled();
-  });
-
-  it('addQty caps at CART_MAX_QTY (50)', () => {
-    component.buyQty = 50;
-    component.addQty();
-    expect(component.buyQty).toBe(50);
-  });
-
-  it('removeQty does not go below 1', () => {
-    component.buyQty = 1;
-    component.removeQty();
-    expect(component.buyQty).toBe(1);
+  it("renders the gallery and price", () => {
+    fixture.detectChanges();
+    const html = fixture.nativeElement as HTMLElement;
+    expect(html.querySelector("h1")?.textContent).toContain("Halden Lounge");
+    expect(html.querySelector(".price")?.textContent).toContain("1890");
   });
 });

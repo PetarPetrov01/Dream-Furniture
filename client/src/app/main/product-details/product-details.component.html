@@ -1,116 +1,56 @@
-<section class="product-details">
+<section class="details">
   <div class="container">
-    <div class="wrapper">
-      <div class="image-section">
-        <div class="media">
-          <img [src]="product()?.image" [alt]="product()?.name" />
-        </div>
-      </div>
-      <div class="buy-section">
-        <h1>{{ product()?.name }}</h1>
-        <p>{{ product()?.category?.join(", ") }}</p>
-        <div class="price">
-          <h1 id="price">
-            ${{ product()?.price! | floorPrice }}<span id="decimals">{{product()?.price! | decimalSlice}}</span>
-          </h1>
-          <span id="monthly-price">or ~ 12 x ${{ monthlyPrice(product()?.price) }}</span>
-        </div>
-        <p class="shipping">
-          Free shipping and express delivery across Europe in just 3-5 working
-          days.
-        </p>
-        <p>Color: {{ product()?.color }}</p>
-        @if (isUser) {
-          @if (!isOwner) {
-            <div class="quantity">
-              <div class="input-group">
-                <p>Quantity:</p>
-                <input
-                  type="number"
-                  id="qty"
-                  [(ngModel)]="buyQty"
-                  (blur)="onInputBlur()"
-                  />
-                </div>
-                <div class="update-qty">
-                  <a (click)="removeQty()">-</a>
-                  <a (click)="addQty()">+</a>
+    @if (product(); as p) {
+      <div class="layout">
+        <app-image-gallery [images]="p.images" [alt]="p.name" />
+        <aside class="info">
+          <p class="eyebrow">{{ p.category.join(" · ") }}</p>
+          <h1>{{ p.name }}</h1>
+          <p class="price">${{ p.price | floorPrice }}<span>{{ p.price | decimalSlice }}</span></p>
+          <p class="stock-tag" [class.out]="!isInStock">
+            <span class="dot"></span>{{ isInStock ? "In stock" : "Made to order" }}
+          </p>
+          <p class="short">{{ p.shortDescription }}</p>
+          <div class="divider"></div>
+          <p class="long">{{ p.description }}</p>
+          <app-spec-table [product]="p" />
+
+          @if (isUser) {
+            @if (!isOwner) {
+              <div class="qty">
+                <label>Quantity</label>
+                <div class="qty-controls">
+                  <button type="button" (click)="removeQty()">−</button>
+                  <input type="number" [(ngModel)]="buyQty" (blur)="onInputBlur()" />
+                  <button type="button" (click)="addQty()">+</button>
                 </div>
               </div>
-              <div class="controls">
-                <a id="button-cart" (click)="addToCart()">Add to cart</a>
-                <a id="button-wishlist" (click)="toggleWishlist()"
-                  ><i
-                    class="fa-heart"
-                    [class.fa-solid]="isInWishList"
-                    [class.fa-regular]="!isInWishList"
-                  ></i
-                ></a>
+              <div class="cta">
+                <button class="primary" (click)="addToCart()" [disabled]="!isInStock">
+                  {{ isInStock ? "Add to cart" : "Currently unavailable" }}
+                </button>
+                <button class="secondary" (click)="toggleWishlist()">
+                  <i class="fa-heart" [class.fa-solid]="isInWishList" [class.fa-regular]="!isInWishList"></i>
+                  Wishlist
+                </button>
               </div>
             }
             @if (isOwner) {
-              <div class="controls owner">
-                <a [routerLink]="'edit'" id="edit-btn">Edit</a>
-                <a id="del-btn" (click)="onDelete()">Delete</a>
+              <div class="owner-controls">
+                <a [routerLink]="'edit'">Edit</a>
+                <a (click)="onDelete()">Delete</a>
               </div>
             }
-          }
-          @if (!isUser) {
-            <div class="controls guest">
-              <a routerLink="/auth/login">Login</a>
-              <a routerLink="/auth/register">Register</a>
+          } @else {
+            <div class="cta">
+              <a class="primary" routerLink="/auth/login">Login to purchase</a>
+              <a class="secondary" routerLink="/auth/register">Register</a>
             </div>
           }
-          <div class="keypoints">
-            <p><i class="fa-solid fa-truck"></i><span>Free delivery</span></p>
-            <p>
-              <i class="fa-solid fa-rotate-left"></i
-                ><span>365 days guaranteed return</span>
-              </p>
-              <p>
-                <i class="fa-solid fa-hand-holding-dollar"></i
-                  ><span>Cash on delivery</span>
-                </p>
-              </div>
-              <p id="post-date">Posted on: {{product()?.createdAt! | dateFormatter}} by {{product()?._ownerId?.username}}</p>
-            </div>
-
-            <div class="info-section">
-              <h2 id="info-heading">Dimensions and characteristics</h2>
-              <p id="description">Description: {{ product()?.description }}</p>
-              <div class="column">
-                <div class="row">
-                  <p class="row-label">Categories:</p>
-                  <p>{{ product()?.category?.join(", ") }}</p>
-                </div>
-                <div class="row">
-                  <p class="row-label">Width:</p>
-                  <p>{{ product()?.dimensions?.width }} mm</p>
-                </div>
-                <div class="row">
-                  <p class="row-label">Height:</p>
-                  <p>{{ product()?.dimensions?.height }} mm</p>
-                </div>
-                <div class="row">
-                  <p class="row-label">Depth:</p>
-                  <p>{{ product()?.dimensions?.depth }} mm</p>
-                </div>
-              </div>
-              <div class="column">
-                <div class="row">
-                  <p class="row-label">Material:</p>
-                  <p>{{ product()?.material?.join(', ') }}</p>
-                </div>
-                <div class="row">
-                  <p class="row-label">Style:</p>
-                  <p>{{ product()?.style }}</p>
-                </div>
-                <div class="row">
-                  <p class="row-label">Color:</p>
-                  <p>{{ product()?.color }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </aside>
+      </div>
+    } @else {
+      <p class="loading">Loading…</p>
+    }
+  </div>
+</section>
