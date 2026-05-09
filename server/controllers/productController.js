@@ -11,25 +11,25 @@ productController.get("/", async (req, res) => {
     const products = await productService.getProducts(req.query);
     res.json(products);
   } catch (error) {
-    const message = errorParser(error);
-    res.status(400).json({ message });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 
-productController.get("/:id", async (req, res) => {
+// Slug-or-id lookup. Slug wins; 24-char hex falls back to id lookup.
+productController.get("/:slug", async (req, res) => {
   try {
-    const productId = req.params.id;
-    const product = await productService.getProductById(productId);
-    const safeUser = {
-      _id: product._ownerId._id,
-      email: product._ownerId.email,
-      username: product._ownerId.username,
-    };
-
+    const product = await productService.getProductBySlugOrId(req.params.slug);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    const safeUser = product._ownerId
+      ? {
+          _id: product._ownerId._id,
+          email: product._ownerId.email,
+          username: product._ownerId.username,
+        }
+      : null;
     res.json({ ...product, _ownerId: safeUser });
   } catch (error) {
-    const errorMessage = errorParser(error);
-    res.status(400).json({ message: errorMessage });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 
@@ -37,12 +37,10 @@ productController.post("/", isUser(), async (req, res) => {
   try {
     const data = req.body;
     data._ownerId = req.user._id;
-
     const product = await productService.addProduct(data);
     res.json(product);
   } catch (error) {
-    const errorMessage = errorParser(error);
-    res.status(400).json({ message: errorMessage });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 
@@ -51,8 +49,7 @@ productController.put("/:id", preload(), isOwner(), async (req, res) => {
     const product = await productService.updateProduct(req.params.id, req.body);
     res.json(product);
   } catch (error) {
-    const errorMessage = errorParser(error);
-    res.status(400).json({ message: errorMessage });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 
@@ -61,8 +58,7 @@ productController.delete("/:id", preload(), isOwner(), async (req, res) => {
     await productService.deleteProduct(req.params.id);
     res.status(204).end();
   } catch (error) {
-    const errorMessage = errorParser(error);
-    res.status(400).json({ message: errorMessage });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 
@@ -70,20 +66,16 @@ productController.post("/:id/wishlist", isUser(), async (req, res) => {
   try {
     const productId = req.params.id;
     const userId = req.user?._id;
-
-    //const {hashedPassword, __v, ...user}
     const user = await wishlistService.toggleItemInWishlist(userId, productId);
     const safeUser = {
       _id: user._id,
       email: user.email,
       username: user.username,
-      wishlist: user.wishlist
+      wishlist: user.wishlist,
     };
-
     res.json(safeUser);
   } catch (error) {
-    const errorMessage = errorParser(error);
-    res.status(400).json({ message: errorMessage });
+    res.status(400).json({ message: errorParser(error) });
   }
 });
 

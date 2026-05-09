@@ -1,0 +1,40 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  width: 240px;
+  padding-right: var(--space-5);
+  border-right: 1px solid var(--color-line);
+}
+.group { display: flex; flex-direction: column; gap: var(--space-3); }
+.label {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-ink-muted);
+}
+ul { display: flex; flex-direction: column; gap: var(--space-2); }
+button {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font: inherit;
+  color: var(--color-ink-muted);
+  background: none; border: none; cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+button.active { color: var(--color-ink); }
+button:hover { color: var(--color-ink); }
+.dot {
+  width: 10px; height: 10px;
+  border: 1px solid var(--color-ink-muted);
+  border-radius: 50%;
+}
+.dot.filled { background: var(--color-ink); border-color: var(--color-ink); }
+.price-row { display: flex; align-items: center; gap: var(--space-3); }
+.price-row label { display: flex; align-items: center; gap: 4px; }
+.price-row input {
+  width: 80px; padding: var(--space-2);
+  border: 1px solid var(--color-line); background: var(--color-surface);
+  font: inherit;
+}

@@ -1,44 +1,14 @@
-<div class="container">
-  <section class="main">
-    <div class="cards">
-      <article class="card info">
-        <h3>Who we are</h3>
-        <p>
-          Welcome to DreamFurniture, your one-stop shop for turning furniture
-          dreams into reality! We understand the importance of creating a space
-          that reflects your unique style and personality. But finding the
-          perfect pieces can feel overwhelming.
-        </p>
-        <p>
-          That's where DreamFurniture comes in. We're a passionate team of
-          furniture enthusiasts and design experts dedicated to making
-          high-quality, customizable furniture accessible to everyone.
-        </p>
-      </article>
-      @if (products().length == 0) {
-        <app-loader-card class="card"/>
-        <app-loader-card class="card"/>
-        <app-loader-card class="card"/>
-      }
-      @if (products().length > 0) {
-        @for (product of products(); track product._id) {
-          <article
-            class="card"
-            [routerLink]="'/products/' + product._id"
-            >
-            <div class="media">
-              <img [src]="product.image" [alt]="product.name" />
-            </div>
-            <div class="content">
-              <p>{{ product.name }}</p>
-              <h3>
-                ${{ product.price | floorPrice }}
-                <span>{{ product.price | decimalSlice }}</span>
-              </h3>
-            </div>
-          </article>
-        }
-      }
-    </div>
-  </section>
-</div>
+<app-hero />
+<app-featured-collection
+  [products]="featured()"
+  [loading]="featuredLoading()"
+  [error]="featuredError()"
+/>
+<app-category-grid />
+<app-new-arrivals
+  [products]="arrivals()"
+  [loading]="arrivalsLoading()"
+  [error]="arrivalsError()"
+/>
+<app-craftsmanship />
+<app-newsletter />

@@ -1,48 +1,28 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  OnInit,
-  inject,
-  signal,
-  computed,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ActivatedRoute, Params, Router } from "@angular/router";
 
-import { Subject, debounceTime } from 'rxjs';
+import { ApiService } from "../../shared/api.service";
+import { APIProduct } from "../../types/Product";
+import { LoaderCardComponent } from "../../shared/loader-card/loader-card.component";
+import { ProductCardComponent } from "./product-card/product-card.component";
+import { FilterRailComponent, FilterState } from "./filter-rail/filter-rail.component";
+import { SortSearchBarComponent } from "./sort-search-bar/sort-search-bar.component";
+import { SectionHeadingComponent } from "../../shared/ui/section-heading/section-heading.component";
 
-import { ApiService } from '../../shared/api.service';
-import { APIProduct } from '../../types/Product';
-import { LoaderCardComponent } from '../../shared/loader-card/loader-card.component';
-
-import { MatChipsModule } from '@angular/material/chips';
-import { MatSliderModule } from '@angular/material/slider';
-
-import { FormsModule } from '@angular/forms';
-import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
-import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
-
-interface PriceRange {
-  lower: number;
-  upper: number;
-}
+const PAGE_SIZE = 12;
 
 @Component({
-  selector: 'app-products',
+  selector: "app-products",
   imports: [
-    CommonModule,
-    RouterLink,
     LoaderCardComponent,
-    MatChipsModule,
-    MatSliderModule,
-    FormsModule,
-    FloorPricePipe,
-    DecimalSlicePipe,
+    ProductCardComponent,
+    FilterRailComponent,
+    SortSearchBarComponent,
+    SectionHeadingComponent,
   ],
-  templateUrl: './products.component.html',
-  styleUrl: './products.component.css',
+  templateUrl: "./products.component.html",
+  styleUrl: "./products.component.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsComponent implements OnInit {
@@ -52,142 +32,74 @@ export class ProductsComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   readonly products = signal<APIProduct[]>([]);
-  readonly queryParams = signal<Params>({});
   readonly isLoading = signal(false);
-  readonly hasQueryParams = computed(
-    () => Object.keys(this.queryParams()).length > 0
-  );
-
-  categoryChange$: Subject<string> = new Subject<string>();
-  hasDebounced: boolean = false;
-
-  search: string = '';
-  sort: string = '';
-  priceRange: PriceRange = {
-    lower: 30,
-    upper: 380,
-  };
-
-  sortOptions = [
-    { value: 'name:asc', text: 'Name (A to Z)' },
-    { value: 'name:desc', text: 'Name (Z to A)' },
-    { value: 'price:asc', text: 'Price ascending' },
-    { value: 'price:desc', text: 'Price descending' },
-    { value: 'createdAt:asc', text: 'Oldest first' },
-    { value: 'createdAt desc', text: 'Newest first' },
-  ];
+  readonly isLoadingMore = signal(false);
+  readonly hasMore = signal(true);
+  readonly error = signal(false);
+  readonly queryParams = signal<Params>({});
+  readonly hasQueryParams = computed(() => Object.keys(this.queryParams()).length > 0);
+  readonly filterState = computed<FilterState>(() => {
+    const q = this.queryParams();
+    const cats = q["category"] ? (Array.isArray(q["category"]) ? q["category"] : [q["category"]]) : [];
+    const [pmin, pmax] = (q["priceRange"] || "0:5000").split(":").map((n: string) => Number(n));
+    return { categories: cats, priceMin: pmin || 0, priceMax: pmax || 5000 };
+  });
 
   ngOnInit(): void {
-    this.isLoading.set(true);
-
-    this.categoryChange$
-      .pipe(debounceTime(1000), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.fetchProducts();
-      });
-
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        this.queryParams.set(params);
-        this.sort = params['sort'] || '';
-        this.search = params['search'] || '';
-
-        if (!this.hasDebounced) {
-          this.fetchProducts();
-        }
+      .subscribe((p) => {
+        this.queryParams.set(p);
+        this.fetch(true);
       });
   }
 
-  fetchProducts() {
-    this.isLoading.set(true);
-    this.apiService
-      .getProducts(this.queryParams())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((prods) => {
+  fetch(reset: boolean) {
+    const q = { ...this.queryParams(), limit: PAGE_SIZE, offset: reset ? 0 : this.products().length };
+    reset ? this.isLoading.set(true) : this.isLoadingMore.set(true);
+    this.error.set(false);
+    this.apiService.getProducts(q).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (page) => {
+        this.products.update((curr) => (reset ? page : [...curr, ...page]));
+        this.hasMore.set(page.length === PAGE_SIZE);
         this.isLoading.set(false);
-        this.products.set(prods);
-      });
-  }
-
-  changeCategory(category: string) {
-    if (category == this.queryParams()['category']) {
-      return;
-    }
-
-    const newCategory = category ? category : null;
-    //If empty string is passed to the params, it still remains in the query, while passing null, complete removes it:
-    //Passing '' => /products?category=
-    //Passing null => /products
-
-    this.hasDebounced = true;
-    //For the initial click (while its still false)
-
-    this.categoryChange$.next(newCategory || '');
-    this.router.navigate(['/products'], {
-      queryParams: { category: newCategory },
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  onSearch() {
-    let search;
-
-    if (this.search) {
-      search = this.search;
-    } else if (this.queryParams()['search']) {
-      //   If the user has searched and clears the search
-      search = null;
-    } else {
-      return;
-    }
-
-    this.hasDebounced = false;
-
-    this.router.navigate(['/products'], {
-      queryParams: { search },
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  onSortChange() {
-    this.hasDebounced = false;
-
-    this.router.navigate(['/products'], {
-      queryParams: { sort: this.sort },
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  onClear() {
-    if (Object.keys(this.queryParams()).length < 1) {
-      return;
-    }
-
-    this.hasDebounced = false;
-    this.priceRange = {
-      lower: 30,
-      upper: 380,
-    };
-    this.router.navigate(['/products']);
-  }
-
-  onPriceChange(caller?: string | null) {
-    if (this.priceRange.lower > this.priceRange.upper) {
-      if (caller == 'lower') {
-        this.priceRange.lower = this.priceRange.upper;
-      }
-      if (caller == 'upper') {
-        this.priceRange.upper = this.priceRange.lower;
-      }
-      return;
-    }
-
-    this.router.navigate(['/products'], {
-      queryParams: {
-        priceRange: `${this.priceRange.lower}:${this.priceRange.upper}`,
+        this.isLoadingMore.set(false);
       },
-      queryParamsHandling: 'merge',
+      error: () => {
+        this.error.set(true);
+        this.isLoading.set(false);
+        this.isLoadingMore.set(false);
+      },
     });
   }
+
+  onFilterChange(state: FilterState) {
+    const queryParams: Params = {
+      category: state.categories.length ? state.categories : null,
+      priceRange: state.priceMin || state.priceMax !== 5000 ? `${state.priceMin}:${state.priceMax}` : null,
+    };
+    this.router.navigate(["/products"], { queryParams, queryParamsHandling: "merge" });
+  }
+
+  onSearch(value: string) {
+    this.router.navigate(["/products"], {
+      queryParams: { search: value || null },
+      queryParamsHandling: "merge",
+    });
+  }
+
+  onSortChange(value: string) {
+    this.router.navigate(["/products"], {
+      queryParams: { sort: value || null },
+      queryParamsHandling: "merge",
+    });
+  }
+
+  onReset() {
+    this.router.navigate(["/products"]);
+  }
+
+  loadMore() { this.fetch(false); }
+
+  retry() { this.fetch(true); }
 }

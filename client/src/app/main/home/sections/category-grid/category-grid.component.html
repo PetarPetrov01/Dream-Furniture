@@ -1,0 +1,13 @@
+<section class="categories">
+  <div class="container">
+    <app-section-heading eyebrow="Spaces" title="Browse by space" />
+    <div class="grid">
+      @for (tile of tiles; track tile.name) {
+        <a class="tile" [routerLink]="['/products']" [queryParams]="{ category: tile.query }">
+          <img [src]="tile.image" [alt]="tile.name" loading="lazy" />
+          <span class="label">{{ tile.name }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>

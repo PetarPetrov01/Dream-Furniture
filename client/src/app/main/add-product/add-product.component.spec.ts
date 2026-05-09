@@ -2,12 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
 
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
 
@@ -23,7 +17,6 @@ describe('AddProductComponent', () => {
   let fixture: ComponentFixture<AddProductComponent>;
   let apiServiceMock: jasmine.SpyObj<ApiService>;
   let activatedRouteMock: any;
-  let fb: jasmine.SpyObj<FormBuilder>;
 
   let paramsSubject: BehaviorSubject<Params>;
 
@@ -36,15 +29,20 @@ describe('AddProductComponent', () => {
 
   const mockProduct: PopulatedProduct = {
     _id: '123',
+    slug: 'test-product',
     name: 'testProduct',
     description: 'test',
-    image: 'test/img',
+    shortDescription: 'short',
+    images: ['test/img'],
     category: ['test'],
     style: 'test',
     dimensions: { height: 1, width: 1, depth: 1 },
     material: ['test'],
     color: 'test',
     price: 1,
+    isFeatured: false,
+    inStock: true,
+    tags: [],
     __v: '1',
     _ownerId: mockUser,
     createdAt: '2024-03-10T11:27:12.452+00:00',
@@ -59,7 +57,6 @@ describe('AddProductComponent', () => {
       'addProduct',
       'updateProduct',
     ]);
-    fb = jasmine.createSpyObj('FormBuilder', ['group']);
 
     activatedRouteMock = { params: paramsSubject.asObservable() };
 
@@ -74,27 +71,10 @@ describe('AddProductComponent', () => {
       providers: [
         { provide: ApiService, useValue: apiServiceMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: FormBuilder, useValue: fb },
       ],
     }).compileComponents();
 
     apiServiceMock.getProduct.and.returnValue(EMPTY);
-
-    fb.group.and.returnValue(
-      new FormGroup({
-        name: new FormControl('', Validators.required),
-        description: new FormControl('', Validators.required),
-        image: new FormControl('', Validators.required),
-        category: new FormControl([''], Validators.required),
-        style: new FormControl('', Validators.required),
-        height: new FormControl('', Validators.required),
-        width: new FormControl('', Validators.required),
-        depth: new FormControl('', Validators.required),
-        material: new FormControl([''], Validators.required),
-        color: new FormControl('', Validators.required),
-        price: new FormControl('', Validators.required),
-      })
-    );
 
     fixture = TestBed.createComponent(AddProductComponent);
     component = fixture.componentInstance;
@@ -111,30 +91,30 @@ describe('AddProductComponent', () => {
     expect(apiServiceMock.getProduct).not.toHaveBeenCalled();
   });
 
-  it('should fetch the product when an id is in the params', () => {
-    paramsSubject.next({ id: '123' });
+  it('should fetch the product when a slug is in the params', () => {
+    paramsSubject.next({ slug: 'test-product' });
     expect(component.isEditing()).toBeTrue();
-    expect(apiServiceMock.getProduct).toHaveBeenCalledWith('123');
+    expect(apiServiceMock.getProduct).toHaveBeenCalledWith('test-product');
   });
 
   it('should patch the form when the product is fetched', () => {
     apiServiceMock.getProduct.and.returnValue(of(mockProduct));
-    paramsSubject.next({ id: '123' });
+    paramsSubject.next({ slug: 'test-product' });
 
-    const modifiedProd = { ...mockProduct, ...mockProduct.dimensions };
-
-    Object.entries(component.addProductForm.value).forEach(([k, value]) => {
-      // dimensions and price are cast to string in the component;
-      // (mockProduct.dimensions as any)[k] is a numeric truthy value
-      // for the dimension keys (height, width, depth), which is why
-      // `== true` works to identify them.
-      // eslint-disable-next-line eqeqeq
-      if ((mockProduct.dimensions as any)[k] == true || k === 'price') {
-        expect(value).toEqual(String((modifiedProd as any)[k]));
-      } else {
-        expect(value).toEqual((modifiedProd as any)[k]);
-      }
-    });
+    const value = component.addProductForm.value;
+    expect(value.name).toBe(mockProduct.name);
+    expect(value.description).toBe(mockProduct.description);
+    expect(value.shortDescription).toBe(mockProduct.shortDescription);
+    expect(value.color).toBe(mockProduct.color);
+    expect(value.style).toBe(mockProduct.style);
+    expect(value.category).toEqual(mockProduct.category);
+    expect(value.material).toEqual(mockProduct.material);
+    expect(value.height).toBe(String(mockProduct.dimensions.height));
+    expect(value.width).toBe(String(mockProduct.dimensions.width));
+    expect(value.depth).toBe(String(mockProduct.dimensions.depth));
+    expect(value.price).toBe(String(mockProduct.price));
+    expect(value.inStock).toBe(mockProduct.inStock);
+    expect(component.images.value).toEqual(mockProduct.images);
   });
 
   it('should do nothing on submit if the form is invalid', () => {

@@ -1,184 +1,42 @@
-<section class="products">
-  <div class="options">
-    <div class="container">
-      <ul class="category-select">
-        <button
-          class="category-btn"
-          (click)="changeCategory('')"
-          [class.selected]="!queryParams()['category']"
-          >
-          @if (!queryParams()['category']) {
-            <i class="fa-solid fa-check"></i>
-            }All
-          </button>
-          <button
-            class="category-btn"
-            (click)="changeCategory('Living room')"
-            [class.selected]="queryParams()['category'] == 'Living room'"
-            >
-            @if (queryParams()['category'] == 'Living room') {
-              <i
-                class="fa-solid fa-check"
-                ></i
-                >
-                }Living room
+<section class="page">
+  <div class="container">
+    <app-section-heading eyebrow="Collection" title="All pieces" />
+
+    <app-sort-search-bar
+      [search]="(queryParams()['search'] ?? '')"
+      [sort]="(queryParams()['sort'] ?? '')"
+      [showReset]="hasQueryParams()"
+      (searchChange)="onSearch($event)"
+      (sortChange)="onSortChange($event)"
+      (reset)="onReset()"
+    />
+
+    <div class="layout">
+      <app-filter-rail [state]="filterState()" (change)="onFilterChange($event)" />
+      <main class="grid-area">
+        @if (isLoading()) {
+          <div class="grid">
+            @for (i of [1,2,3,4,5,6,7,8,9]; track i) { <app-loader-card /> }
+          </div>
+        } @else if (error()) {
+          <p class="state">Couldn't load products. <a (click)="retry()">Try again</a></p>
+        } @else if (products().length === 0) {
+          <p class="state">No pieces match these filters. <a (click)="onReset()">Clear filters</a></p>
+        } @else {
+          <div class="grid">
+            @for (p of products(); track p._id) {
+              <app-product-card [product]="p" density="default" />
+            }
+          </div>
+          @if (hasMore()) {
+            <div class="more">
+              <button (click)="loadMore()" [disabled]="isLoadingMore()">
+                {{ isLoadingMore() ? "Loading…" : "Load more" }}
               </button>
-              <button
-                class="category-btn"
-                (click)="changeCategory('Bedroom')"
-                [class.selected]="queryParams()['category'] == 'Bedroom'"
-                >
-                @if (queryParams()['category'] == 'Bedroom') {
-                  <i
-                    class="fa-solid fa-check"
-                    ></i
-                    >
-                    }Bedroom
-                  </button>
-                  <button
-                    class="category-btn"
-                    (click)="changeCategory('Dining room')"
-                    [class.selected]="queryParams()['category'] == 'Dining room'"
-                    >
-                    @if (queryParams()['category'] == 'Dining room') {
-                      <i
-                        class="fa-solid fa-check"
-                        ></i
-                        >
-                        }Dining room
-                      </button>
-                      <button
-                        class="category-btn"
-                        (click)="changeCategory('Home office')"
-                        [class.selected]="queryParams()['category'] == 'Home office'"
-                        >
-                        @if (queryParams()['category'] == 'Home office') {
-                          <i
-                            class="fa-solid fa-check"
-                            ></i
-                            >
-                            }Home office
-                          </button>
-                          <button
-                            class="category-btn"
-                            (click)="changeCategory('Outdoor')"
-                            [class.selected]="queryParams()['category'] == 'Outdoor'"
-                            >
-                            @if (queryParams()['category'] == 'Outdoor') {
-                              <i
-                                class="fa-solid fa-check"
-                                ></i
-                                >
-                                }Outdoor
-                              </button>
-                            </ul>
-                            <div class="query-controls">
-                              <div class="priceRange">
-                                <mat-slider min="0" max="500" discrete="true">
-                                  <input
-                                    [(ngModel)]="priceRange.lower"
-                                    matSliderStartThumb
-                                    (change)="onPriceChange()"
-                                    />
-                                    <input
-                                      [(ngModel)]="priceRange.upper"
-                                      matSliderEndThumb
-                                      (change)="onPriceChange()"
-                                      />
-                                    </mat-slider>
-                                    <div class="inputs">
-                                      <div class="input-group">
-                                        <label for="">$</label
-                                          ><input
-                                          type="text"
-                                          [(ngModel)]="priceRange.lower"
-                                          (change)="onPriceChange('lower')"
-                                          min="0"
-                                          [max]="priceRange.upper"
-                                          />
-                                        </div>
-                                        <p>-</p>
-                                        <div class="input-group">
-                                          <label for="">$</label
-                                            ><input
-                                            type="text"
-                                            [(ngModel)]="priceRange.upper"
-                                            (change)="onPriceChange('upper')"
-                                            max="500"
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <form class="search" (ngSubmit)="onSearch()">
-                                        <input
-                                          id="search"
-                                          type="text"
-                                          placeholder="Search..."
-                                          name="search"
-                                          [(ngModel)]="search"
-                                          />
-                                          <button type="submit" id="search-btn">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                          </button>
-                                        </form>
-                                        <div class="sort">
-                                          <select name="sort" [(ngModel)]="sort" (change)="onSortChange()">
-                                            <option value="" disabled>Sort by</option>
-                                            @for (option of sortOptions; track option) {
-                                              <option [value]="option.value">
-                                                {{ option.text }}
-                                              </option>
-                                            }
-                                          </select>
-                                        </div>
-                                        <div class="clear">
-                                          @if (hasQueryParams()) {
-                                            <a (click)="onClear()">RESET</a>
-                                          }
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    class="products-wrapper"
-    [ngStyle]="{
-      'justify-content':
-        products().length && products().length > 2 ? 'flex-start' : 'center'
-    }"
-                                    >
-                                    @if (products().length == 0 && !isLoading()) {
-                                      <h1 class="no-products">
-                                        There are currently no products to show!
-                                      </h1>
-                                    }
-
-                                    @if (isLoading()) {
-                                      <app-loader-card />
-                                      <app-loader-card />
-                                      <app-loader-card />
-                                      <app-loader-card />
-                                    }
-
-                                    @if (!isLoading()) {
-                                      @for (prod of products(); track prod._id) {
-                                        <div class="card">
-                                          <div class="filler">
-                                            <div class="media">
-                                              <a [routerLink]="prod._id">
-                                                <img [src]="prod.image" alt="" />
-                                              </a>
-                                            </div>
-                                            <div class="info">
-                                              <h3>{{ prod.name }}</h3>
-                                              <p>{{ prod.material.join(", ") }}</p>
-                                              <p>
-                                                ${{ prod.price | floorPrice
-                                                }}<span>{{ prod.price | decimalSlice }}</span>
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      }
-                                    }
-                                  </div>
-                                </section>
+            </div>
+          }
+        }
+      </main>
+    </div>
+  </div>
+</section>

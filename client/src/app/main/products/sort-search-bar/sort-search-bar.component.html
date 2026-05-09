@@ -1,0 +1,12 @@
+<div class="bar">
+  <form class="search" (ngSubmit)="submitSearch()">
+    <input type="text" placeholder="Search pieces" name="search" [(ngModel)]="localSearch" />
+  </form>
+  <div class="right">
+    @if (showReset()) { <a class="reset" (click)="onReset()">Reset</a> }
+    <select [(ngModel)]="localSort" (change)="onSortChange()">
+      <option value="" disabled>Sort by</option>
+      @for (o of sortOptions; track o.value) { <option [value]="o.value">{{ o.text }}</option> }
+    </select>
+  </div>
+</div>

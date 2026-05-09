@@ -1,0 +1,16 @@
+<section class="arrivals">
+  <div class="container">
+    <app-section-heading eyebrow="New" title="Newly arrived" />
+    <div class="rail">
+      @if (loading()) {
+        @for (i of [1,2,3,4,5,6]; track i) { <app-loader-card class="rail-item" /> }
+      } @else if (error()) {
+        <p class="error">Couldn't load new arrivals.</p>
+      } @else {
+        @for (p of products(); track p._id) {
+          <app-product-card class="rail-item" [product]="p" density="rail" />
+        }
+      }
+    </div>
+  </div>
+</section>

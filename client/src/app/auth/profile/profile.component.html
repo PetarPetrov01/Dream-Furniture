@@ -22,8 +22,8 @@
         <div class="wrapper">
           @for (product of products(); track product._id) {
             <div class="card">
-              <div class="media" [routerLink]="'/products/' + product._id">
-                <img [src]="product.image" [alt]="product.name" />
+              <div class="media" [routerLink]="'/products/' + product.slug">
+                <img [src]="product.images[0]" [alt]="product.name" />
               </div>
               <div class="content">
                 <div class="info">
@@ -32,7 +32,7 @@
                   <h3>{{ product.material.join(", ") }}</h3>
                 </div>
                 <div class="controls">
-                  <a  id="edit-btn" [routerLink]="'/products/' + product._id + '/edit'">Edit</a>
+                  <a  id="edit-btn" [routerLink]="'/products/' + product.slug + '/edit'">Edit</a>
                   <a  id="delete-btn" (click)="onDelete(product)">Delete</a>
                 </div>
               </div>

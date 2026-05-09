@@ -13,7 +13,7 @@ const productRoutes = {
         ),
     },
     {
-      path: ':id',
+      path: ':slug',
       children: [
         {
           path: '',

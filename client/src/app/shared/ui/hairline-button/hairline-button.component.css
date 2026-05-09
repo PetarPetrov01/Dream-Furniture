@@ -1,0 +1,23 @@
+.hairline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-ink);
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.hairline-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.arrow {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.hairline-btn:hover .arrow {
+  transform: translateX(4px);
+}

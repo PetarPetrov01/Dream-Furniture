@@ -28,8 +28,8 @@
               @for (product of order.products; track product._id) {
                 <div class="product-card">
                   <div class="media">
-                    <a [routerLink]="'/products/' + product.product._id">
-                      <img [src]="product.product.image" alt="" />
+                    <a [routerLink]="'/products/' + product.product.slug">
+                      <img [src]="product.product.images[0]" alt="" />
                     </a>
                   </div>
                   <div class="product-info">

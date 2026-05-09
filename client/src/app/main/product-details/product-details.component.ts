@@ -18,9 +18,11 @@ import { PopulatedProduct } from '../../types/Product';
 
 import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.component';
 
-import { DateFormatterPipe } from '../../shared/pipes/date-formatter.pipe';
 import { FloorPricePipe } from '../../shared/pipes/floor-price.pipe';
 import { DecimalSlicePipe } from '../../shared/pipes/decimal-slice.pipe';
+
+import { ImageGalleryComponent } from './image-gallery/image-gallery.component';
+import { SpecTableComponent } from './spec-table/spec-table.component';
 
 import { CartStore } from '../../auth/cart/cart.store';
 import { NotificationService } from '../../shared/notification/notification.service';
@@ -32,9 +34,10 @@ import { CART_MAX_QTY, DIALOG_DEFAULTS } from '../../shared/ui-constants';
     CommonModule,
     FormsModule,
     RouterLink,
-    DateFormatterPipe,
     FloorPricePipe,
     DecimalSlicePipe,
+    ImageGalleryComponent,
+    SpecTableComponent,
   ],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css',
@@ -59,15 +62,16 @@ export class ProductDetailsComponent implements OnInit {
     this.activated.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        this.productId = params['id'];
-        this.apiService.getProduct(this.productId)
+        const slug = params['slug'];
+        this.apiService.getProduct(slug)
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (prod) => {
               this.product.set(prod);
+              this.productId = prod._id;
             },
             error: () => {
-              this.router.navigate([`/products/${this.productId}/not-found`]);
+              this.router.navigate(['/not-found']);
             },
           });
       });
@@ -85,6 +89,10 @@ export class ProductDetailsComponent implements OnInit {
     return this.authService.user?.wishlist.some(
       (prodId) => prodId == this.productId
     );
+  }
+
+  get isInStock() {
+    return this.product()?.inStock !== false;
   }
 
   monthlyPrice(price: number | undefined): string {
@@ -111,7 +119,10 @@ export class ProductDetailsComponent implements OnInit {
     this.apiService.toggleWishList(this.productId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
-        this.router.navigate([`/products/${this.productId}`]);
+        const slug = this.product()?.slug;
+        if (slug) {
+          this.router.navigate([`/products/${slug}`]);
+        }
         this.authService.setUserStorage(user);
         this.authService.setUserSubject(user);
       });

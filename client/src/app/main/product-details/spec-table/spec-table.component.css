@@ -1,0 +1,8 @@
+.spec { display: flex; flex-direction: column; }
+.spec > div {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.spec dt { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--color-ink-muted); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+.spec dd { font-family: var(--font-body); font-size: var(--fs-base); }

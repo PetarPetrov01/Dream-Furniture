@@ -1,0 +1,20 @@
+<section class="featured">
+  <div class="container">
+    <app-section-heading eyebrow="Featured" title="This season's pieces" />
+    @if (loading()) {
+      <div class="grid">
+        <app-loader-card class="large" />
+        <app-loader-card />
+        <app-loader-card />
+      </div>
+    } @else if (error()) {
+      <p class="error">Couldn't load featured pieces.</p>
+    } @else if (products().length >= 3) {
+      <div class="grid">
+        <app-product-card class="large" [product]="products()[0]" density="featured" />
+        <app-product-card [product]="products()[1]" density="default" />
+        <app-product-card [product]="products()[2]" density="default" />
+      </div>
+    }
+  </div>
+</section>

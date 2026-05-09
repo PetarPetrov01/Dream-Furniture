@@ -1,0 +1,14 @@
+<section class="newsletter">
+  <div class="container">
+    <h3>Stay in touch</h3>
+    <p>Quarterly notes on new pieces, no marketing.</p>
+    @if (submitted()) {
+      <p class="thanks" aria-live="polite">Thank you — we'll be in touch.</p>
+    } @else {
+      <form (ngSubmit)="onSubmit()">
+        <input type="email" [(ngModel)]="email" name="email" placeholder="you@example.com" required />
+        <button type="submit">Subscribe →</button>
+      </form>
+    }
+  </div>
+</section>

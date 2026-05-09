@@ -19,8 +19,8 @@
         @for (product of wishlist(); track product._id) {
           <div class="card">
             <div class="media">
-              <a [routerLink]="'/products/' + product._id">
-                <img [src]="product.image" [alt]="product.name" />
+              <a [routerLink]="'/products/' + product.slug">
+                <img [src]="product.images[0]" [alt]="product.name" />
               </a>
             </div>
             <div class="content">

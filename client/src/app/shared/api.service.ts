@@ -1,31 +1,30 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Params } from '@angular/router';
+import { Injectable, inject } from "@angular/core";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Params } from "@angular/router";
 
-import { tap } from 'rxjs';
+import { APIProduct, PopulatedProduct, Product } from "../types/Product";
+import { User } from "../types/User";
 
-import { APIProduct, PopulatedProduct, Product } from '../types/Product';
-import { User } from '../types/User';
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: "root" })
 export class ApiService {
   private http = inject(HttpClient);
 
-
   getProducts(params: Params) {
-    return this.http.get<APIProduct[]>('/api/products', { params });
+    let httpParams = new HttpParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v === null || v === undefined || v === "") return;
+      if (Array.isArray(v)) v.forEach((item) => (httpParams = httpParams.append(k, String(item))));
+      else httpParams = httpParams.set(k, String(v));
+    });
+    return this.http.get<APIProduct[]>("/api/products", { params: httpParams });
   }
 
-  getProduct(productId: string) {
-    return this.http
-      .get<PopulatedProduct>(`/api/products/${productId}`)
-      .pipe(tap((res) => {}));
+  getProduct(slugOrId: string) {
+    return this.http.get<PopulatedProduct>(`/api/products/${slugOrId}`);
   }
 
   addProduct(data: Product) {
-    return this.http.post<APIProduct>('/api/products', data);
+    return this.http.post<APIProduct>("/api/products", data);
   }
 
   updateProduct(productId: string, data: Product) {
