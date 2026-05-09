@@ -1,0 +1,14 @@
+<div class="gallery">
+  @if (images().length) {
+    <div class="hero">
+      <img [src]="images()[0]" [alt]="alt()" (error)="onImageError($event)" />
+    </div>
+    @if (images().length > 1) {
+      <div class="grid">
+        @for (src of images().slice(1); track src; let i = $index) {
+          <img [src]="src" [alt]="alt() + ' detail ' + (i + 1)" (error)="onImageError($event)" loading="lazy" />
+        }
+      </div>
+    }
+  }
+</div>
