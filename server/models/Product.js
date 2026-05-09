@@ -9,7 +9,7 @@ const categories = [
   "Outdoor",
 ];
 
-const imagePattern = /^(https?:\/\/|assets\/images\/)[^ ]+\.?(png|jpg|jpeg)(\?.*)?$/;
+const imagePattern = /^(https?:\/\/|assets\/images\/)\S+$/;
 
 function slugify(name) {
   return name

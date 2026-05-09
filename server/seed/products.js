@@ -5,14 +5,15 @@ const catalog = require("./catalog");
 const { ensureHouseUser } = require("./house-user");
 
 async function run() {
-  const uri = process.env.MONGO_URI;
+  const uri = process.env.DATABASE_URL || process.env.MONGO_URI;
   if (!uri) {
-    console.error("Missing MONGO_URI in environment");
+    console.error("Missing DATABASE_URL (or MONGO_URI) in environment");
     process.exit(1);
   }
 
   await mongoose.connect(uri);
-  console.log("[seed] Connected to MongoDB");
+  const host = new URL(uri.replace(/^mongodb\+srv:\/\//, "https://").replace(/^mongodb:\/\//, "http://")).host;
+  console.log(`[seed] Connected to MongoDB (${host})`);
 
   const houseUser = await ensureHouseUser();
   console.log(`[seed] House user: ${houseUser._id}`);
