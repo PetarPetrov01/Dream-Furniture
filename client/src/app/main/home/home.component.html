@@ -24,7 +24,7 @@
         @for (product of products(); track product._id) {
           <article
             class="card"
-            [routerLink]="'/products/' + product._id"
+            [routerLink]="'/products/' + product.slug"
             >
             <div class="media">
               <img [src]="product.image" [alt]="product.name" />

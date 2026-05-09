@@ -59,15 +59,16 @@ export class ProductDetailsComponent implements OnInit {
     this.activated.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        this.productId = params['id'];
-        this.apiService.getProduct(this.productId)
+        const slug = params['slug'];
+        this.apiService.getProduct(slug)
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (prod) => {
               this.product.set(prod);
+              this.productId = prod._id;
             },
             error: () => {
-              this.router.navigate([`/products/${this.productId}/not-found`]);
+              this.router.navigate(['/not-found']);
             },
           });
       });
@@ -111,7 +112,10 @@ export class ProductDetailsComponent implements OnInit {
     this.apiService.toggleWishList(this.productId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
-        this.router.navigate([`/products/${this.productId}`]);
+        const slug = this.product()?.slug;
+        if (slug) {
+          this.router.navigate([`/products/${slug}`]);
+        }
         this.authService.setUserStorage(user);
         this.authService.setUserSubject(user);
       });
