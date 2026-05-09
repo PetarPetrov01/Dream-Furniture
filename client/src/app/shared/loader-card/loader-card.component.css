@@ -1,43 +1,26 @@
 :host {
   display: block;
-  flex: 0 0 20.5%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  position: relative;
 }
-
-.loader-card {
-  width: 100%;
-  display: block;
-  height: 100%;
-  min-height: 55vh;
-  border: 1px solid #eee;
-  background: linear-gradient(0.25turn, transparent, #fff, transparent),
-    linear-gradient(#ddd, #ddd), linear-gradient(#ddd, #ddd),
-    linear-gradient(#ddd, #ddd), linear-gradient(#ddd, #ddd);
-  background-color: #fff;
-  background-repeat: no-repeat;
-  background-size: 100% 100%, 80% 50%, 60% 5%, 40% 4.5%, 30% 8%;
-  background-position: -250px 0, 50% 20px, 25% 65%, 17.5% 75%, 15% 87.5%;
-  animation: loading 1.5s infinite;
+:host::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-muted) 0%,
+    var(--color-line) 50%,
+    var(--color-surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s var(--ease-out) infinite;
 }
-
-@keyframes loading {
-  to {
-    background-position: 250px 0, 50% 20px, 25% 65%, 17.5% 75%, 15% 87.5%;
-  }
-}
-
-@media (max-width: 1000px) {
-  :host {
-    flex-basis: 29.33%;
-  }
-}
-
-@media (max-width: 700px) {
-  :host {
-    flex-basis: 48%;
-    margin-bottom: 0.5em;
-  }
-
-  .loader-card {
-    min-height: 25vh;
-  }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
