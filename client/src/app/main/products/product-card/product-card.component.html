@@ -1,0 +1,11 @@
+<a class="card" [class]="'density-' + density()" [routerLink]="'/products/' + product().slug">
+  <div class="media">
+    <img [src]="product().images[0]" [alt]="product().name" loading="lazy" />
+  </div>
+  <div class="content">
+    <h3 class="name">{{ product().name }}</h3>
+    <p class="price">
+      ${{ product().price | floorPrice }}<span>{{ product().price | decimalSlice }}</span>
+    </p>
+  </div>
+</a>
