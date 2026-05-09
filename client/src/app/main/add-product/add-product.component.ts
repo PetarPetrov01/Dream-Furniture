@@ -11,7 +11,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
+  FormArray,
   FormBuilder,
+  FormControl,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -19,6 +21,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { ApiService } from '../../shared/api.service';
 
@@ -32,6 +35,7 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatCheckboxModule,
     LoaderComponent,
   ],
   templateUrl: './add-product.component.html',
@@ -48,7 +52,7 @@ export class AddProductComponent implements OnInit {
   editProductId: string | null = null;
   readonly isEditing = signal(false);
   readonly isLoading = signal(false);
-  
+
   categoryList = [
     'Living room',
     'Bedroom',
@@ -73,43 +77,11 @@ export class AddProductComponent implements OnInit {
     'pink',
   ];
 
-  ngOnInit(): void {
-    this.activatedRoute.params
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        const editedProductId = params['id'] || null;
-        if (editedProductId) {
-          this.editProductId = editedProductId;
-          this.isEditing.set(true);
-
-          this.apiService
-            .getProduct(editedProductId)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((currentProd) => {
-              const { dimensions, ...editProduct } = currentProd;
-
-              this.addProductForm.patchValue({
-                width: String(dimensions.width),
-                height: String(dimensions.height),
-                depth: String(dimensions.depth),
-                name: editProduct.name,
-                category: editProduct.category ? editProduct.category : [],
-                color: editProduct.color,
-                description: editProduct.description,
-                image: editProduct.image,
-                material: editProduct.material,
-                price: String(editProduct.price),
-                style: editProduct.style,
-              });
-            });
-        }
-      });
-  }
-
   addProductForm = this.fb.group({
     name: ['', Validators.required],
     description: ['', Validators.required],
-    image: ['', Validators.required],
+    shortDescription: ['', [Validators.required, Validators.maxLength(200)]],
+    images: this.fb.array([this.fb.control('', Validators.required)]),
     category: [[''], Validators.required],
     style: ['', Validators.required],
     height: ['', Validators.required],
@@ -118,7 +90,57 @@ export class AddProductComponent implements OnInit {
     material: [[''], Validators.required],
     color: ['', Validators.required],
     price: ['', Validators.required],
+    inStock: [true],
   });
+
+  get images(): FormArray<FormControl<string | null>> {
+    return this.addProductForm.get('images') as FormArray<FormControl<string | null>>;
+  }
+
+  addImageInput() {
+    this.images.push(this.fb.control('', Validators.required));
+  }
+
+  removeImageInput(index: number) {
+    if (this.images.length > 1) this.images.removeAt(index);
+  }
+
+  ngOnInit(): void {
+    this.activatedRoute.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const editedProductSlug = params['slug'] || null;
+        if (editedProductSlug) {
+          this.isEditing.set(true);
+
+          this.apiService
+            .getProduct(editedProductSlug)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((currentProd) => {
+              this.editProductId = currentProd._id;
+              const { dimensions, images, ...editProduct } = currentProd;
+              this.images.clear();
+              (images || []).forEach((url) =>
+                this.images.push(this.fb.control(url, Validators.required))
+              );
+              this.addProductForm.patchValue({
+                width: String(dimensions.width),
+                height: String(dimensions.height),
+                depth: String(dimensions.depth),
+                name: editProduct.name,
+                category: editProduct.category ?? [],
+                color: editProduct.color,
+                description: editProduct.description,
+                shortDescription: editProduct.shortDescription,
+                material: editProduct.material,
+                price: String(editProduct.price),
+                style: editProduct.style,
+                inStock: editProduct.inStock,
+              });
+            });
+        }
+      });
+  }
 
   handleClick() {
     if (this.addProductForm.invalid) {
@@ -126,36 +148,33 @@ export class AddProductComponent implements OnInit {
     }
 
     this.isLoading.set(true);
-    const { width, height, depth, ...values } = this.addProductForm.value;
+    const { width, height, depth, images, ...values } = this.addProductForm.value;
     const dimensions = {
       width: Number(width),
       height: Number(height),
       depth: Number(depth),
     };
-    
-    const safeValues = {
+    const data = {
       name: values.name || '',
       description: values.description || '',
-      image: values.image || '',
+      shortDescription: values.shortDescription || '',
+      images: (images || []).filter((u): u is string => !!u && u.length > 0),
       category: Array.isArray(values.category) ? values.category : [],
       style: values.style || '',
       material: Array.isArray(values.material) ? values.material : [],
       color: values.color || '',
       price: Number(values.price) || 0,
-    };
-    
-    const data: Product = {
-      ...safeValues,
+      inStock: values.inStock ?? true,
       dimensions,
     };
-    
+
     if (this.isEditing() && this.editProductId) {
       this.apiService
         .updateProduct(this.editProductId, data)
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
+        .subscribe((updated) => {
           this.isLoading.set(false);
-          this.router.navigate([`/products/${this.editProductId}`]);
+          this.router.navigate([`/products/${updated.slug}`]);
         });
     } else {
       this.apiService

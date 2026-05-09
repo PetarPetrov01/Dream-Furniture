@@ -42,25 +42,28 @@
                     }
                   </mat-form-field>
                   <mat-form-field>
-                    <mat-label for="">Image</mat-label>
-                    <input
-                      matInput
-                      type="text"
-                      formControlName="image"
-                      pattern="^(https?:\/\/|assets\/images\/)[^ ]+\.?(png|jpg)$"
-                      />
-                      @if (addProductForm.get('image')?.hasError('required')) {
-                        <mat-error
-                          >Image is required</mat-error
-                          >
-                      }
-
-                      @if (addProductForm.get('image')?.hasError('pattern')) {
-                        <mat-error
-                          >Invalid image URL</mat-error
-                          >
-                        }
-                      </mat-form-field>
+                    <mat-label>Short description</mat-label>
+                    <input matInput formControlName="shortDescription" maxlength="200" />
+                    @if (addProductForm.get('shortDescription')?.hasError('required')) {
+                      <mat-error>Short description is required</mat-error>
+                    }
+                    @if (addProductForm.get('shortDescription')?.hasError('maxlength')) {
+                      <mat-error>Short description must be 200 characters or fewer</mat-error>
+                    }
+                  </mat-form-field>
+                  <div formArrayName="images" class="image-repeater">
+                    <label>Images (URLs)</label>
+                    @for (ctrl of images.controls; track $index; let i = $index) {
+                      <div class="image-row">
+                        <mat-form-field appearance="outline" class="image-input">
+                          <input matInput [formControlName]="i" placeholder="https://..." />
+                        </mat-form-field>
+                        <button type="button" (click)="removeImageInput(i)" [disabled]="images.length === 1">Remove</button>
+                      </div>
+                    }
+                    <button type="button" (click)="addImageInput()">Add image</button>
+                  </div>
+                  <mat-checkbox formControlName="inStock">In stock</mat-checkbox>
                       <mat-form-field>
                         <mat-label>Category</mat-label>
                         <mat-select formControlName="category" multiple>
