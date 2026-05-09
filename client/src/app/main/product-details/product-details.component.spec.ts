@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MatDialogModule } from "@angular/material/dialog";
 import { BehaviorSubject, of } from "rxjs";
@@ -35,7 +35,6 @@ describe("ProductDetailsComponent", () => {
       providers: [
         { provide: ApiService, useValue: api },
         { provide: ActivatedRoute, useValue: { params: params$.asObservable() } },
-        { provide: Router, useValue: jasmine.createSpyObj("Router", ["navigate"]) },
         { provide: AuthService, useValue: { isLogged: false, user: null } },
         { provide: CartStore, useValue: { addItem: () => {} } },
         { provide: NotificationService, useValue: { setNotification: () => {} } },
@@ -53,6 +52,8 @@ describe("ProductDetailsComponent", () => {
     fixture.detectChanges();
     const html = fixture.nativeElement as HTMLElement;
     expect(html.querySelector("h1")?.textContent).toContain("Halden Lounge");
-    expect(html.querySelector(".price")?.textContent).toContain("1890");
+    // FloorPricePipe inserts thousands separators ("1 890") and DecimalSlicePipe
+    // appends the cents ("00"); just verify the meaningful digits are present.
+    expect(html.querySelector(".price")?.textContent).toContain("1 890");
   });
 });

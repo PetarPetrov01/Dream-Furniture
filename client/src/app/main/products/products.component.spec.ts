@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
 import { BehaviorSubject, EMPTY, of } from "rxjs";
 import { ProductsComponent } from "./products.component";
@@ -18,7 +18,6 @@ describe("ProductsComponent", () => {
       imports: [ProductsComponent, RouterTestingModule],
       providers: [
         { provide: ApiService, useValue: api },
-        { provide: Router, useValue: jasmine.createSpyObj("Router", ["navigate"]) },
         { provide: ActivatedRoute, useValue: { queryParams: queryParams$.asObservable() } },
       ],
     }).compileComponents();
@@ -34,11 +33,20 @@ describe("ProductsComponent", () => {
   });
 
   it("appends results when loadMore is invoked", () => {
-    const first = [{ _id: "a" } as any];
-    const second = [{ _id: "b" } as any];
-    api.getProducts.and.returnValues(of(first), of(second));
+    // Minimum shape ProductCardComponent reads: slug, name, price, images.
+    const stub = (id: string) => ({
+      _id: id,
+      slug: `slug-${id}`,
+      name: `Product ${id}`,
+      price: 100,
+      images: ["https://example.com/img.jpg"],
+      category: ["Living room"],
+      material: ["Wood"],
+    }) as any;
+    api.getProducts.and.returnValues(of([stub("a")]), of([stub("b")]));
+    // BehaviorSubject already emits its initial value on subscribe via ngOnInit,
+    // so detectChanges triggers the first fetch by itself.
     fixture.detectChanges();
-    queryParams$.next({});
     component.loadMore();
     expect(component.products().length).toBe(2);
   });
