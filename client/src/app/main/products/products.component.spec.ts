@@ -1,82 +1,45 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ActivatedRoute, Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
+import { BehaviorSubject, EMPTY, of } from "rxjs";
+import { ProductsComponent } from "./products.component";
+import { ApiService } from "../../shared/api.service";
 
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
-
-import { ProductsComponent } from './products.component';
-import { ApiService } from '../../shared/api.service';
-import { APIProduct } from '../../types/Product';
-
-describe('ProductsComponent', () => {
-  let component: ProductsComponent;
+describe("ProductsComponent", () => {
   let fixture: ComponentFixture<ProductsComponent>;
-  let apiServiceMock: jasmine.SpyObj<ApiService>;
-  let routerMock: jasmine.SpyObj<Router>;
-  let routeMock: any;
-
-  const queryParamsSubject = new BehaviorSubject({});
-  const mockQueryParams = { sort: 'name:asc', category: 'Living room' };
-  const mockProducts: APIProduct[] = [
-    {
-      _id: '123',
-      name: '',
-      description: '',
-      image: '',
-      category: [''],
-      style: '',
-      dimensions: { height: 1, width: 1, depth: 1 },
-      material: [''],
-      color: '',
-      price: 1,
-      __v: '1',
-      _ownerId: '123',
-      createdAt: '123',
-    },
-  ];
+  let component: ProductsComponent;
+  let api: jasmine.SpyObj<ApiService>;
+  const queryParams$ = new BehaviorSubject({});
 
   beforeEach(async () => {
-    apiServiceMock = jasmine.createSpyObj('ApiService', ['getProducts']);
-    routerMock = jasmine.createSpyObj('Router', ['navigate']);
-    routeMock = { queryParams: queryParamsSubject.asObservable() };
-
+    api = jasmine.createSpyObj("ApiService", ["getProducts"]);
+    api.getProducts.and.returnValue(EMPTY);
     await TestBed.configureTestingModule({
       imports: [ProductsComponent, RouterTestingModule],
       providers: [
-        { provide: ApiService, useValue: apiServiceMock },
-        { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: routeMock },
+        { provide: ApiService, useValue: api },
+        { provide: Router, useValue: jasmine.createSpyObj("Router", ["navigate"]) },
+        { provide: ActivatedRoute, useValue: { queryParams: queryParams$.asObservable() } },
       ],
     }).compileComponents();
-
-    apiServiceMock.getProducts.and.returnValue(EMPTY);
-
     fixture = TestBed.createComponent(ProductsComponent);
     component = fixture.componentInstance;
+  });
+
+  it("queries products with paging on init", () => {
+    api.getProducts.and.returnValue(of([]));
     fixture.detectChanges();
+    queryParams$.next({});
+    expect(api.getProducts).toHaveBeenCalledWith(jasmine.objectContaining({ limit: 12, offset: 0 }));
   });
 
-  it('should create and call getProducts on init', () => {
-    queryParamsSubject.next({});
-    expect(component).toBeTruthy();
-    expect(apiServiceMock.getProducts).toHaveBeenCalledWith({});
-  });
-
-  it('should call getProducts with the latest queryParams on fetchProducts', () => {
-    queryParamsSubject.next(mockQueryParams);
-    component.fetchProducts();
-    expect(apiServiceMock.getProducts).toHaveBeenCalledWith(mockQueryParams);
-  });
-
-  it('should populate the products signal when the api emits', () => {
-    apiServiceMock.getProducts.and.returnValue(of(mockProducts));
-    component.fetchProducts();
-    expect(component.products()).toEqual(mockProducts);
-  });
-
-  it('should set isLoading=false after products arrive', () => {
-    apiServiceMock.getProducts.and.returnValue(of(mockProducts));
-    component.fetchProducts();
-    expect(component.isLoading()).toBeFalse();
+  it("appends results when loadMore is invoked", () => {
+    const first = [{ _id: "a" } as any];
+    const second = [{ _id: "b" } as any];
+    api.getProducts.and.returnValues(of(first), of(second));
+    fixture.detectChanges();
+    queryParams$.next({});
+    component.loadMore();
+    expect(component.products().length).toBe(2);
   });
 });
