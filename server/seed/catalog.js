@@ -1,14 +1,16 @@
 // 24 curated products spread across 5 categories and 5 styles.
-// Image URLs are Picsum placeholders for the initial seed; replaced in Phase 9.
-const img = (seed) => `https://picsum.photos/seed/${seed}/1600/1100.jpg`;
-
 const catalog = [
   {
     name: "Halden Lounge",
     shortDescription: "A reclined silhouette in saddle leather and walnut.",
     description:
       "Halden takes the mid-century lounge to its quietest expression. The frame is solid walnut, mortise-and-tenoned for stillness; the cushioning is hand-stitched saddle leather over horsehair. Built to settle into for a long evening.\n\nDelivery is white-glove; assembly takes minutes.",
-    images: [img("halden-1"), img("halden-2"), img("halden-3"), img("halden-4")],
+    images: [
+      "https://images.unsplash.com/photo-1768687983413-adacbda44369?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617364852223-75f57e78dc96?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506898667547-42e22a46e125?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Living room"],
     style: "Mid-century",
     dimensions: { height: 820, width: 760, depth: 880 },
@@ -23,7 +25,12 @@ const catalog = [
     shortDescription: "Three seats of brushed bouclé on an oak plinth.",
     description:
       "Marlow is a long, low sofa designed to anchor a room without filling it. The bouclé is wool-rich and density-tuned; the plinth is white oak with a soft natural oil.\n\nMade to order in eight weeks.",
-    images: [img("marlow-1"), img("marlow-2"), img("marlow-3"), img("marlow-4")],
+    images: [
+      "https://images.unsplash.com/photo-1686510347470-0e36eb055a30?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1684165610413-2401399e0e59?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1657827378620-b8ae5380d3a9?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1722966767575-16b036ea5217?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Living room"],
     style: "Contemporary",
     dimensions: { height: 720, width: 2400, depth: 950 },
@@ -38,7 +45,12 @@ const catalog = [
     shortDescription: "A low slab of charred ash on tapered legs.",
     description:
       "Nori uses shou sugi ban — Japanese charred ash — for its top, sealing the grain in deep matte black. Legs are blackened steel, tapered to almost-nothing.\n\nA piece that disappears underneath the room around it.",
-    images: [img("nori-1"), img("nori-2"), img("nori-3")],
+    images: [
+      "https://images.unsplash.com/photo-1619911013257-8f1fbc919fc9?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1496180727794-817822f65950?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1559662780-33af019fd570?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544597980-426873210008?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Living room"],
     style: "Japandi",
     dimensions: { height: 320, width: 1200, depth: 600 },
@@ -52,7 +64,12 @@ const catalog = [
     shortDescription: "Welded steel shelving with reclaimed oak planks.",
     description:
       "Atlas is industrial in the original sense — built for libraries and workshops. Powder-coated steel uprights, oak planks pulled from decommissioned barns.\n\nFloor-anchored or freestanding; ships flat.",
-    images: [img("atlas-1"), img("atlas-2"), img("atlas-3"), img("atlas-4")],
+    images: [
+      "https://images.unsplash.com/photo-1741880893442-66f56ad8f3a4?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1741880861439-348d9ad18c44?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1741880907168-79a7aaac7875?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1759753814103-fc3a820ca4bb?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Living room", "Home office"],
     style: "Industrial",
     dimensions: { height: 2100, width: 1800, depth: 380 },
@@ -66,7 +83,12 @@ const catalog = [
     shortDescription: "Fluted ash doors over a clean ash carcass.",
     description:
       "Linden is a Scandinavian sideboard restrained to its essentials. The fluted door fronts are turned on a horizontal lathe; the carcass is rift-cut ash.\n\nSoft-close hinges; one shelf adjustable.",
-    images: [img("linden-1"), img("linden-2"), img("linden-3"), img("linden-4")],
+    images: [
+      "https://images.unsplash.com/photo-1713810958247-01dbd76b4a61?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1721385675060-9982ec72385e?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1618220048045-10a6dbdf83e0?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1612908317776-a3afde8232fa?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Living room", "Dining room"],
     style: "Scandinavian",
     dimensions: { height: 820, width: 1800, depth: 460 },
@@ -81,7 +103,12 @@ const catalog = [
     shortDescription: "A platform bed in white-oiled oak; no headboard.",
     description:
       "Saga is a low platform — Scandinavian in posture, intentionally without a headboard so the wall behind it can do the work. White-oiled oak frame; slatted base.\n\nKing or queen.",
-    images: [img("saga-1"), img("saga-2"), img("saga-3"), img("saga-4")],
+    images: [
+      "https://images.unsplash.com/photo-1600494448655-ae58f58bb945?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1601578318413-af2284f10486?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1610307522657-8c0304960189?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Bedroom"],
     style: "Scandinavian",
     dimensions: { height: 280, width: 1900, depth: 2150 },
@@ -96,7 +123,12 @@ const catalog = [
     shortDescription: "A single drawer, paper-cord pull, ash carcass.",
     description:
       "Kelda is small. One drawer, one woven paper-cord pull, one open shelf below for a book. Made the same way for sixty years.",
-    images: [img("kelda-1"), img("kelda-2"), img("kelda-3")],
+    images: [
+      "https://images.unsplash.com/photo-1585128719715-46776b56a0d1?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1593194632872-3d19dab6e278?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1611665860244-43cc95fa586e?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Bedroom"],
     style: "Japandi",
     dimensions: { height: 520, width: 420, depth: 380 },
@@ -110,7 +142,12 @@ const catalog = [
     shortDescription: "A pivoting four-door wardrobe in figured walnut.",
     description:
       "Aalto is mid-century at scale. Four pivoting doors in book-matched walnut, brushed-brass spine pulls, internal cedar lining. Hung-rail and shelves on the inside.\n\nFreestanding; not for wall mounting.",
-    images: [img("aalto-1"), img("aalto-2"), img("aalto-3"), img("aalto-4")],
+    images: [
+      "https://images.unsplash.com/photo-1672137233327-37b0c1049e77?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1618236444721-4a8dba415c15?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1631048499455-4f9e26f23b9f?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1530411554903-7e745b9f1f6d?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Bedroom"],
     style: "Mid-century",
     dimensions: { height: 2100, width: 2000, depth: 580 },
@@ -124,7 +161,12 @@ const catalog = [
     shortDescription: "Six drawers, soft-close, in matte plaster lacquer.",
     description:
       "Vesta is contemporary minimalism in a six-drawer. Front faces are sprayed in matte plaster lacquer over MDF; the carcass is birch ply. Soft-close runners.",
-    images: [img("vesta-1"), img("vesta-2"), img("vesta-3")],
+    images: [
+      "https://images.unsplash.com/photo-1704428381445-dc61b037cfd2?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1568506759799-16b274da9e15?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1568506758676-94f1a4e9b4fc?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1599703678443-4fdafa9e1d0a?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Bedroom"],
     style: "Contemporary",
     dimensions: { height: 820, width: 1700, depth: 480 },
@@ -138,7 +180,12 @@ const catalog = [
     shortDescription: "A floating vanity with a brushed-brass mirror.",
     description:
       "Mira is wall-mounted; the top floats over open storage. Mirror is round, brushed-brass framed. Drawer fronts are oak veneer.",
-    images: [img("mira-1"), img("mira-2"), img("mira-3"), img("mira-4")],
+    images: [
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1712214741533-3dd5b8013ca7?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1623922939942-38c39476cbff?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1621215065447-28744f6b9e87?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Bedroom"],
     style: "Contemporary",
     dimensions: { height: 1500, width: 1100, depth: 420 },
@@ -152,7 +199,12 @@ const catalog = [
     shortDescription: "A 12-seat dining slab on welded steel trestles.",
     description:
       "Forge is built for long dinners. A single live-edge slab of European oak, finished in matte oil; trestles are blackened welded steel.\n\nShipped flat; trestles bolt on with a single tool.",
-    images: [img("forge-1"), img("forge-2"), img("forge-3"), img("forge-4")],
+    images: [
+      "https://images.unsplash.com/photo-1576249720336-35b043fce96d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1694830470410-2339a679c942?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1690603933976-253760032686?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1577156359864-0dbcae08713d?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Dining room"],
     style: "Industrial",
     dimensions: { height: 760, width: 3200, depth: 1100 },
@@ -167,7 +219,12 @@ const catalog = [
     shortDescription: "A bentwood frame and woven paper-cord seat.",
     description:
       "Oslo follows the Scandinavian dining-chair tradition exactly: steam-bent oak frame, woven paper-cord seat, stretchers. Made to last decades.",
-    images: [img("oslo-1"), img("oslo-2"), img("oslo-3")],
+    images: [
+      "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Dining room"],
     style: "Scandinavian",
     dimensions: { height: 780, width: 460, depth: 480 },
@@ -181,7 +238,12 @@ const catalog = [
     shortDescription: "A hardwood dining bench with a tapered profile.",
     description:
       "Rye seats three or four. Solid hardwood plank, hand-shaped tapers, indoor-outdoor finish. Pairs with Forge.",
-    images: [img("rye-1"), img("rye-2"), img("rye-3")],
+    images: [
+      "https://images.unsplash.com/photo-1567622058083-200736df7570?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571339797354-88c2cdaa5b32?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1570297725535-7452e6f4b3d0?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1684006997278-371c43c7012f?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Dining room", "Outdoor"],
     style: "Mid-century",
     dimensions: { height: 460, width: 1800, depth: 350 },
@@ -195,7 +257,12 @@ const catalog = [
     shortDescription: "A long buffet with sliding lattice doors.",
     description:
       "Larch slides — instead of swinging — its doors. The fronts are a hand-mortised lattice; behind them, two adjustable shelves.",
-    images: [img("larch-1"), img("larch-2"), img("larch-3"), img("larch-4")],
+    images: [
+      "https://images.unsplash.com/photo-1567225477277-c8162eb4991d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1718524767499-7fe3a6ab4f8c?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1718524767487-7f98d4e5eeeb?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1567016520496-0cb37d8467a7?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Dining room"],
     style: "Japandi",
     dimensions: { height: 820, width: 2100, depth: 460 },
@@ -209,7 +276,12 @@ const catalog = [
     shortDescription: "A blown-glass pendant in seafoam green.",
     description:
       "Tide is hand-blown borosilicate glass, suspended on a brass cord. Sized for a dining table or an entryway. E26 socket; bulb sold separately.",
-    images: [img("tide-1"), img("tide-2"), img("tide-3")],
+    images: [
+      "https://images.unsplash.com/photo-1743838244119-3d2be1fb8ac0?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1749704648469-b1e8e465a4ef?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1762280237740-5a9292e527ab?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1773810773827-91cd658820a9?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Dining room", "Living room"],
     style: "Contemporary",
     dimensions: { height: 320, width: 280, depth: 280 },
@@ -223,7 +295,12 @@ const catalog = [
     shortDescription: "A two-pedestal desk in steel and reclaimed oak.",
     description:
       "Ridge is a workhorse: 1800mm of work surface, two pedestal cabinets with file-rated drawers, cable management trough behind the top.\n\nLeft- or right-handed cable cutout.",
-    images: [img("ridge-1"), img("ridge-2"), img("ridge-3"), img("ridge-4")],
+    images: [
+      "https://images.unsplash.com/photo-1656403002413-2ac6137237d6?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1568146687696-427782f92379?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1648809895588-c0bd7e06a61c?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Home office"],
     style: "Industrial",
     dimensions: { height: 740, width: 1800, depth: 720 },
@@ -238,7 +315,12 @@ const catalog = [
     shortDescription: "An ergonomic task chair in wool-felt and aluminum.",
     description:
       "Field replaces mesh with high-density wool felt, layered over a five-axis ergonomic frame. Aluminum base, forward-tilt mechanism.",
-    images: [img("field-1"), img("field-2"), img("field-3")],
+    images: [
+      "https://images.unsplash.com/photo-1598628435234-84bb173f3f8a?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1707386320247-0bd3e8e8ea6d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1615228676574-e3d3d86347af?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1574081105756-3c8d8ed70198?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Home office"],
     style: "Contemporary",
     dimensions: { height: 1100, width: 660, depth: 660 },
@@ -252,7 +334,12 @@ const catalog = [
     shortDescription: "A modular wall-mount shelving system in walnut.",
     description:
       "Quill is wall-mounted via a continuous rail and brass support pegs. Shelves come in three depths; mix and stack at any height.",
-    images: [img("quill-1"), img("quill-2"), img("quill-3"), img("quill-4")],
+    images: [
+      "https://images.unsplash.com/photo-1588111948296-83a8e036e004?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1768393992748-8e58b9ab321d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1758366278819-413b166ca7c0?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1761971975684-9b900192df96?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Home office"],
     style: "Mid-century",
     dimensions: { height: 1800, width: 1500, depth: 280 },
@@ -266,7 +353,12 @@ const catalog = [
     shortDescription: "Two-drawer file cabinet in clay-tone enamel.",
     description:
       "Loam is industrial archive-grade in domestic colorways. Two file-rated drawers, baked enamel in clay; brass bail pulls.",
-    images: [img("loam-1"), img("loam-2"), img("loam-3")],
+    images: [
+      "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1488485282435-e2ad51917a76?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1664382952681-30fe4b179437?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Home office"],
     style: "Industrial",
     dimensions: { height: 720, width: 460, depth: 600 },
@@ -280,7 +372,12 @@ const catalog = [
     shortDescription: "A ceramic floor lamp with a paper drum shade.",
     description:
       "Clay's body is wheel-thrown stoneware in unglazed terracotta; the shade is hand-rolled paper. E14 socket; reaches 1.5m.",
-    images: [img("clay-1"), img("clay-2"), img("clay-3"), img("clay-4")],
+    images: [
+      "https://images.unsplash.com/photo-1673939859210-23d8444237ff?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1607809714110-e34f71c7b2ed?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1606425288528-4cebbfc69de7?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Home office", "Living room"],
     style: "Japandi",
     dimensions: { height: 1500, width: 380, depth: 380 },
@@ -294,7 +391,12 @@ const catalog = [
     shortDescription: "An outdoor lounge in teak and quick-dry sling.",
     description:
       "Coast is built for terraces. Teak, finished bare for natural patina; quick-dry sling fabric in cement grey. Stainless-steel hardware.",
-    images: [img("coast-1"), img("coast-2"), img("coast-3"), img("coast-4")],
+    images: [
+      "https://images.unsplash.com/photo-1715245926272-91bdc5f9b1db?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1666713838610-bbfe08cc930f?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1631752674874-9994662712af?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1664732744927-4f7803850dd2?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Outdoor"],
     style: "Contemporary",
     dimensions: { height: 880, width: 720, depth: 920 },
@@ -308,7 +410,12 @@ const catalog = [
     shortDescription: "A patinated steel fire table on iron legs.",
     description:
       "Anvil is a propane fire pit doubled as a low table. Patinated cor-ten steel top, lava rocks included, hidden gas line, 50,000 BTU burner.",
-    images: [img("anvil-1"), img("anvil-2"), img("anvil-3"), img("anvil-4")],
+    images: [
+      "https://images.unsplash.com/photo-1598833775803-99eea89ad6a1?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507498016354-887e17c7d231?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1470549584009-d347338fc0ff?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1578156642347-f010af93ce43?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Outdoor"],
     style: "Industrial",
     dimensions: { height: 380, width: 1100, depth: 1100 },
@@ -322,7 +429,12 @@ const catalog = [
     shortDescription: "Outdoor dining table plus four chairs in white oak.",
     description:
       "Drift is a complete dining set engineered for the outdoors: one 1800mm table plus four armchairs, all in marine-grade white oak with weather-rated joinery.",
-    images: [img("drift-1"), img("drift-2"), img("drift-3"), img("drift-4")],
+    images: [
+      "https://images.unsplash.com/photo-1463183547458-6a2c760d0912?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1586718520704-f7f9db04b8c0?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1530062845289-9109b2c9c868?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1591728534642-b68f534bfee5?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Outdoor"],
     style: "Scandinavian",
     dimensions: { height: 760, width: 1800, depth: 900 },
@@ -336,7 +448,12 @@ const catalog = [
     shortDescription: "A garden bench with a planter inset on each end.",
     description:
       "Bramble integrates two cedar planters into a bench's profile, so the seat is enclosed by greenery. Recommended for sun-bright entryways.",
-    images: [img("bramble-1"), img("bramble-2"), img("bramble-3")],
+    images: [
+      "https://images.unsplash.com/photo-1590188865734-b0d9d580fa39?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1654073324856-3bd171d1f5fe?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1622413109763-49fa4af7a6c1?w=1600&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1572455926658-050c58805952?w=1600&q=80&auto=format&fit=crop",
+    ],
     category: ["Outdoor"],
     style: "Japandi",
     dimensions: { height: 460, width: 1800, depth: 460 },
