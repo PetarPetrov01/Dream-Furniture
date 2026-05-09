@@ -1,0 +1,11 @@
+@if (href()) {
+  <a [routerLink]="href()" class="hairline-btn">
+    <span>{{ label() }}</span>
+    @if (arrow()) { <span class="arrow">→</span> }
+  </a>
+} @else {
+  <button class="hairline-btn" type="button">
+    <span>{{ label() }}</span>
+    @if (arrow()) { <span class="arrow">→</span> }
+  </button>
+}
