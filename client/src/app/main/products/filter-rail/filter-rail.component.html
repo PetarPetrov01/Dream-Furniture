@@ -1,0 +1,28 @@
+<aside class="rail">
+  <section class="group">
+    <p class="label">Category</p>
+    <ul>
+      @for (c of allCategories; track c) {
+        <li>
+          <button
+            type="button"
+            [class.active]="state().categories.includes(c)"
+            (click)="toggleCategory(c)"
+          >
+            <span class="dot" [class.filled]="state().categories.includes(c)"></span>
+            {{ c }}
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="group">
+    <p class="label">Price</p>
+    <div class="price-row">
+      <label><span>$</span><input type="number" [value]="state().priceMin" (change)="onPriceChange($any($event.target).valueAsNumber, state().priceMax)" /></label>
+      <span>—</span>
+      <label><span>$</span><input type="number" [value]="state().priceMax" (change)="onPriceChange(state().priceMin, $any($event.target).valueAsNumber)" /></label>
+    </div>
+  </section>
+</aside>
