@@ -14,7 +14,7 @@
           @for (product of products(); track product._id) {
             <div class="card">
               <div class="media">
-                <img [src]="product.image" alt="{{ product.name }}" />
+                <img [src]="product.images[0]" alt="{{ product.name }}" />
               </div>
               <div class="card-info">
                 <h3>{{ product.name }}</h3>

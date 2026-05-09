@@ -20,7 +20,7 @@
           <div class="card">
             <div class="media">
               <a [routerLink]="'/products/' + product.slug">
-                <img [src]="product.image" [alt]="product.name" />
+                <img [src]="product.images[0]" [alt]="product.name" />
               </a>
             </div>
             <div class="content">
