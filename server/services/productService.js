@@ -1,11 +1,11 @@
 const Product = require("../models/Product");
 
 async function getProducts(query) {
-  let products;
   const optionsArr = [];
 
   if (query.category) {
-    optionsArr.push({ category: { $in: query.category } });
+    const cats = Array.isArray(query.category) ? query.category : [query.category];
+    optionsArr.push({ category: { $in: cats } });
   }
 
   if (query.search) {
@@ -13,21 +13,36 @@ async function getProducts(query) {
   }
 
   if (query.priceRange) {
-    optionsArr.push({
-      price: { $gte: query.priceRange.lower || 0, $lte: query.priceRange.upper },
-    });
+    const { lower, upper } = query.priceRange;
+    optionsArr.push({ price: { $gte: Number(lower) || 0, $lte: Number(upper) } });
+  }
+
+  if (query.isFeatured !== undefined) {
+    optionsArr.push({ isFeatured: String(query.isFeatured) === "true" });
+  }
+
+  if (query.tag) {
+    const tags = Array.isArray(query.tag) ? query.tag : [query.tag];
+    optionsArr.push({ tags: { $in: tags } });
   }
 
   const queryObj = optionsArr.length > 0 ? { $and: optionsArr } : {};
-  products = await Product.find(queryObj)
-    .sort(query.sort || null)
-    .limit(query.limit || null);
-
-  return products;
+  let q = Product.find(queryObj).sort(query.sort || null);
+  if (query.offset) q = q.skip(Number(query.offset));
+  if (query.limit) q = q.limit(Number(query.limit));
+  return await q;
 }
 
 async function getProductById(productId) {
   return await Product.findById(productId).populate("_ownerId").lean();
+}
+
+async function getProductBySlugOrId(slugOrId) {
+  let product = await Product.findOne({ slug: slugOrId }).populate("_ownerId").lean();
+  if (!product && /^[a-f0-9]{24}$/i.test(slugOrId)) {
+    product = await Product.findById(slugOrId).populate("_ownerId").lean();
+  }
+  return product;
 }
 
 async function addProduct(data) {
@@ -36,11 +51,10 @@ async function addProduct(data) {
 
 async function updateProduct(productId, data) {
   const product = await Product.findById(productId);
-
-  product.name = data.name;
   product.name = data.name;
   product.description = data.description;
-  product.image = data.image;
+  product.shortDescription = data.shortDescription;
+  product.images = data.images;
   product.category = data.category;
   product.style = data.style;
   product.dimensions = {
@@ -51,7 +65,7 @@ async function updateProduct(productId, data) {
   product.material = data.material;
   product.color = data.color;
   product.price = Number(data.price);
-
+  if (data.inStock !== undefined) product.inStock = !!data.inStock;
   return await product.save();
 }
 
@@ -66,6 +80,7 @@ async function getOwn(userId) {
 const productService = {
   getProducts,
   getProductById,
+  getProductBySlugOrId,
   addProduct,
   updateProduct,
   deleteProduct,
