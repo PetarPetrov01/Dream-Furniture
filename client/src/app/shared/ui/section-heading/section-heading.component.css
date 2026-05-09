@@ -1,0 +1,18 @@
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-7);
+}
+.section-heading.center {
+  align-items: center;
+  text-align: center;
+}
+.section-heading h2 {
+  font-size: var(--fs-2xl);
+}
+@media (min-width: 800px) {
+  .section-heading h2 {
+    font-size: var(--fs-3xl);
+  }
+}
