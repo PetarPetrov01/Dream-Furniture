@@ -1,0 +1,15 @@
+.craft { padding: var(--space-9) 0; background: var(--color-surface-muted); }
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+@media (min-width: 800px) {
+  .container { grid-template-columns: 3fr 2fr; gap: var(--space-8); align-items: center; }
+}
+.media img { width: 100%; height: auto; display: block; }
+.copy { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+.copy p { color: var(--color-ink-muted); line-height: var(--lh-loose); }
