@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const AppError = require("../util/AppError");
 
 async function getOrders(userId) {
   const orders = await Order.find({ _ownerId: userId })
@@ -20,7 +21,7 @@ async function createOrder(data) {
     const product = await Product.findById(p.product).lean();
 
     if (product._ownerId == data._ownerId) {
-      throw new Error("You can't buy your own product");
+      throw new AppError("You can't buy your own product", 400);
     }
 
     return (await acc) + product.price * p.count;
