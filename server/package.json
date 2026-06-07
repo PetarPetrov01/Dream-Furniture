@@ -2,11 +2,15 @@
   "name": "server",
   "version": "1.0.0",
   "description": "REST-API",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "test": "node --test",
-    "seed": "node ./seed/products.js"
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "seed": "tsx src/seed/products.ts"
   },
   "author": "",
   "license": "ISC",
