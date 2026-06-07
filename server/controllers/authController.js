@@ -1,6 +1,5 @@
 const authService = require("../services/authService");
 const { authCookieName } = require("../config/cookie.js");
-const asyncHandler = require("../util/asyncHandler.js");
 
 const { isGuest, isUser } = require("../middlewares/guards.js");
 const { authLimiter } = require("../middlewares/rateLimit.js");
@@ -24,12 +23,12 @@ authController.post(
   "/login",
   authLimiter,
   isGuest(),
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const { email, password } = req.body;
     const { user, authToken } = await authService.login(email, password);
     setAuthCookie(res, authToken);
     res.json(user);
-  })
+  }
 );
 
 authController.post(
@@ -38,7 +37,7 @@ authController.post(
   isGuest(),
   ...registerValidators,
   validate,
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const { username, email, password } = req.body;
     const { user, authToken } = await authService.register(
       username,
@@ -47,7 +46,7 @@ authController.post(
     );
     setAuthCookie(res, authToken);
     res.json(user);
-  })
+  }
 );
 
 authController.get("/logout", (req, res) => {
@@ -59,41 +58,41 @@ authController.get("/logout", (req, res) => {
 authController.get(
   "/profile",
   isUser(),
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const user = await authService.getUser(req.user?._id);
     res.status(200).json(user);
-  })
+  }
 );
 
 authController.patch(
   "/profile",
   isUser(),
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const user = await authService.editUser(
       req.user._id,
       req.body.username,
       req.body.email
     );
     res.json(user);
-  })
+  }
 );
 
 authController.get(
   "/wishlist",
   isUser(),
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const wishlist = await wishlistService.getWishlist(req.user?._id);
     res.json(wishlist);
-  })
+  }
 );
 
 authController.get(
   "/posts",
   isUser(),
-  asyncHandler(async (req, res) => {
+  async (req, res) => {
     const ownProducts = await productService.getOwn(req.user?._id);
     res.json(ownProducts);
-  })
+  }
 );
 
 module.exports = authController;
