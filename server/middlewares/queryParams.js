@@ -1,21 +1,16 @@
 module.exports = () => (req, res, next) => {
-    if (Object.keys(req.query).length > 0) {
+  const query = { ...req.query };
 
-        if (req.query.sort) {
-            const [sortKey, order] = req.query.sort.split(':');
-            req.query.sort = {
-                [sortKey]: order == 'asc' ? 1 : -1
-            };
-        };
-        
-        if(req.query.priceRange) {
-            const [lower, upper] = req.query.priceRange.split(':');
-            req.query.priceRange = {
-                lower,
-                upper
-            }
-        }
-    }
+  if (typeof query.sort === "string" && query.sort !== "") {
+    const [sortKey, order] = query.sort.split(":");
+    query.sort = { [sortKey]: order === "asc" ? 1 : -1 };
+  }
 
-    next();
+  if (typeof query.priceRange === "string" && query.priceRange !== "") {
+    const [lower, upper] = query.priceRange.split(":");
+    query.priceRange = { lower, upper };
+  }
+
+  res.locals.query = query;
+  next();
 };
