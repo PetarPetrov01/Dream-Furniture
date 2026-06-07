@@ -2,15 +2,14 @@ const authService = require("../services/authService");
 const { authCookieName } = require("../config/cookie.js");
 const asyncHandler = require("../util/asyncHandler.js");
 
-const { body, validationResult } = require("express-validator");
 const { isGuest, isUser } = require("../middlewares/guards.js");
 const { authLimiter } = require("../middlewares/rateLimit.js");
+const { registerValidators } = require("../middlewares/validators.js");
+const validate = require("../middlewares/validate.js");
 const wishlistService = require("../services/wishlistService.js");
 const productService = require("../services/productService.js");
 
 const authController = require("express").Router();
-
-const emailPattern = "[a-zA-Z0-9]{5,}@[a-zA-Z]+.[a-zA-Z]{2,}$";
 
 const cookieOptions =
   process.env.NODE_ENV == "production"
@@ -37,19 +36,9 @@ authController.post(
   "/register",
   authLimiter,
   isGuest(),
-  body("email").matches(emailPattern).withMessage("Invalid email"),
-  body("username")
-    .isLength({ min: 5 })
-    .withMessage("Username must be atleast 5 characters long"),
-  body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be atleast 6 characters long"),
+  ...registerValidators,
+  validate,
   asyncHandler(async (req, res) => {
-    const errors = validationResult(req).errors;
-    if (errors.length > 0) {
-      throw errors;
-    }
-
     const { username, email, password } = req.body;
     const { user, authToken } = await authService.register(
       username,

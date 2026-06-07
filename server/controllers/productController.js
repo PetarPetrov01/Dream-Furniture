@@ -1,6 +1,8 @@
 const { isUser, isOwner } = require("../middlewares/guards");
 const preload = require("../middlewares/preload");
 const asyncHandler = require("../util/asyncHandler");
+const { productValidators } = require("../middlewares/validators");
+const validate = require("../middlewares/validate");
 const wishlistService = require("../services/wishlistService");
 const productService = require("../services/productService");
 
@@ -35,6 +37,8 @@ productController.get(
 productController.post(
   "/",
   isUser(),
+  ...productValidators,
+  validate,
   asyncHandler(async (req, res) => {
     const data = req.body;
     data._ownerId = req.user._id;
@@ -47,6 +51,8 @@ productController.put(
   "/:id",
   preload(),
   isOwner(),
+  ...productValidators,
+  validate,
   asyncHandler(async (req, res) => {
     const product = await productService.updateProduct(req.params.id, req.body);
     res.json(product);
