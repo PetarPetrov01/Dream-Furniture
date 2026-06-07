@@ -1,5 +1,7 @@
 const { isUser } = require("../middlewares/guards");
 const asyncHandler = require("../util/asyncHandler");
+const { orderValidators } = require("../middlewares/validators");
+const validate = require("../middlewares/validate");
 const orderService = require("../services/orderService");
 
 const orderController = require("express").Router();
@@ -25,6 +27,8 @@ orderController.get(
 orderController.post(
   "/create",
   isUser(),
+  ...orderValidators,
+  validate,
   asyncHandler(async (req, res) => {
     const data = req.body;
     data._ownerId = req.user._id;
