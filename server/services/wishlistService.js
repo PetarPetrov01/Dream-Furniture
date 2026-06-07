@@ -3,27 +3,22 @@ const User = require("../models/User");
 const AppError = require("../util/AppError");
 
 async function toggleItemInWishlist(userId, productId) {
-  const user = await User.findById(userId);
-  const product = await Product.findById(productId);
-
-  if (product._ownerId.toString() == userId) {
+  const product = await Product.findById(productId).select("_ownerId");
+  if (!product) {
+    throw new AppError("Product not found", 404);
+  }
+  if (String(product._ownerId) === String(userId)) {
     throw new AppError("You can't add your own product to the wishlist", 400);
   }
 
-  const productInWishlist = user.wishlist.find((prodId) => {
-    return prodId == productId;
-  });
+  // Atomic field-level toggle: pull if already present, otherwise add.
+  // Avoids the load-filter-save race that can drop concurrent updates.
+  const present = await User.exists({ _id: userId, wishlist: productId });
+  const update = present
+    ? { $pull: { wishlist: productId } }
+    : { $addToSet: { wishlist: productId } };
 
-  if (productInWishlist) {
-    //remove from wish list
-    user.wishlist = user.wishlist.filter((prodId) => prodId != productId);
-  } else {
-    //add to wishlist
-    user.wishlist.push(productId);
-  }
-
-  const newUser = await user.save();
-  return newUser;
+  return await User.findByIdAndUpdate(userId, update, { new: true });
 }
 
 async function getWishlist(userId) {
