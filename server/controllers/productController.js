@@ -9,8 +9,9 @@ const productController = require("express").Router();
 productController.get(
   "/",
   asyncHandler(async (req, res) => {
-    const products = await productService.getProducts(req.query);
-    res.json(products);
+    const { items, total } = await productService.getProducts(req.query);
+    res.set("X-Total-Count", String(total));
+    res.json(items);
   })
 );
 

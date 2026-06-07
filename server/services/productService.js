@@ -35,7 +35,10 @@ async function getProducts(query) {
   let q = Product.find(queryObj).sort(query.sort || null);
   if (query.offset) q = q.skip(Number(query.offset));
   if (query.limit) q = q.limit(Number(query.limit));
-  return await q;
+
+  // total = full match count ignoring limit/offset, for pagination.
+  const [items, total] = await Promise.all([q, Product.countDocuments(queryObj)]);
+  return { items, total };
 }
 
 async function getProductById(productId) {
