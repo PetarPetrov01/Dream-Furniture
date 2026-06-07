@@ -23,6 +23,7 @@ module.exports = async (app) => {
         "https://dream-furniture-1e92c.web.app",
       ],
       credentials: true,
+      exposedHeaders: ["X-Total-Count"],
     })
   );
   app.use(session());
