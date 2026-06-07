@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { jwtSecret: secret } = require("../config/env");
+const AppError = require("../util/AppError");
 
 const TOKEN_TTL = "7d";
 
@@ -11,12 +12,12 @@ async function login(email, password) {
     strength: 2,
   });
   if (!existingUser) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
   const matchPass = await bcrypt.compare(password, existingUser.hashedPassword);
   if (!matchPass) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
   return createToken(existingUser);
@@ -29,7 +30,7 @@ async function register(username, email, password) {
   });
 
   if (existingUser) {
-    throw new Error("This email is already taken");
+    throw new AppError("This email is already taken", 409);
   }
 
   const user = await User.create({
