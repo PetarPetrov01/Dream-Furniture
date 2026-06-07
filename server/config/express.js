@@ -2,17 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
-require("dotenv").config();
+const { databaseUrl, cookieSecret } = require("./env");
 
 const session = require("../middlewares/session");
 const queryParams = require("../middlewares/queryParams");
 
-const connectionString =
-  process.env.DATABASE_URL || "mongodb://localhost:27017/dream-furniture";
-const cookieSecret = process.env.COOKIE_SECRET || "DreamFurniture";
-
 module.exports = async (app) => {
-  const connection = await mongoose.connect(connectionString);
+  const connection = await mongoose.connect(databaseUrl);
   console.log("Connected to Database");
 
   app.use(express.json());

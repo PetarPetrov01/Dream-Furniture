@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { jwtSecret: secret } = require("../config/env");
 
-const secret = process.env.JWT_SECRET || "whg73hdgw6";
+const TOKEN_TTL = "7d";
 
 async function login(email, password) {
   const existingUser = await User.findOne({ email }).collation({
@@ -82,7 +83,7 @@ function createToken(user) {
       username: user.username,
       wishlist: user.wishlist,
     },
-    authToken: jwt.sign(payload, secret /*,{ expiresIn: "30s" }*/),
+    authToken: jwt.sign(payload, secret, { expiresIn: TOKEN_TTL }),
   };
 }
 
