@@ -6,12 +6,11 @@ module.exports = () => (req, res, next) => {
 
   if (token) {
     try {
-      const payload = authService.verifyToken(token);
-      req.user = payload;
-      // req.token = token;
+      req.user = authService.verifyToken(token);
     } catch (error) {
-      res.status(401).json({ message: "Invalid auth token" })
-      return;
+      // Invalid or expired token: drop the bad cookie and continue as a guest.
+      // Guards still reject protected routes; public routes stay accessible.
+      res.clearCookie(authCookieName);
     }
   }
 
