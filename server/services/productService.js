@@ -1,5 +1,10 @@
 const Product = require("../models/Product");
 
+// Escape regex metacharacters so user input is matched literally (no ReDoS / injection).
+function escapeRegex(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 async function getProducts(query) {
   let products;
   const optionsArr = [];
@@ -9,7 +14,7 @@ async function getProducts(query) {
   }
 
   if (query.search) {
-    optionsArr.push({ name: { $regex: new RegExp(query.search, "i") } });
+    optionsArr.push({ name: { $regex: new RegExp(escapeRegex(query.search), "i") } });
   }
 
   if (query.priceRange) {
