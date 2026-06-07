@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { jwtSecret: secret } = require("../config/env");
 
+const TOKEN_TTL = "7d";
+
 async function login(email, password) {
   const existingUser = await User.findOne({ email }).collation({
     locale: "en",
@@ -81,7 +83,7 @@ function createToken(user) {
       username: user.username,
       wishlist: user.wishlist,
     },
-    authToken: jwt.sign(payload, secret /*,{ expiresIn: "30s" }*/),
+    authToken: jwt.sign(payload, secret, { expiresIn: TOKEN_TTL }),
   };
 }
 
