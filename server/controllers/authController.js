@@ -86,7 +86,9 @@ authController.get("/logout", async (req, res) => {
         })
         .json({ message: "Succesfully logged out" });
     } else {
-      res.clearCookie(authCookieName, { httpOnly: false });
+      res
+        .clearCookie(authCookieName, { httpOnly: false })
+        .json({ message: "Succesfully logged out" });
     }
   } catch (error) {
     const errorMessage = errorParser(error);
