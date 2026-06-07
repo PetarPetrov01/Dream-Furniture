@@ -1,8 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-const secret = process.env.JWT_SECRET || "whg73hdgw6";
+const { jwtSecret: secret } = require("../config/env");
 
 async function login(email, password) {
   const existingUser = await User.findOne({ email }).collation({
